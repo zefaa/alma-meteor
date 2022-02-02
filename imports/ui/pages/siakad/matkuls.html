@@ -1,0 +1,1247 @@
+<!-- matkul create -->
+<template name="matkulPage">
+<div class="page page-matkul-page">
+  <h1 class="page-title">Pengaturan matkul</h1>
+  {{#if matkulForm }}
+
+    {{> quickForm id="matkulForm" collection=formCollection type="insert"}}
+
+  {{/if}}
+  <section class="section-page-shoulders">
+    <div class="btn-group" role="group" aria-label="command control">
+      {{#if isInRole 'admin, superadmin'}}
+        <button class="btn btn-primary" id="toggle-matkul-form"><i class="fa fa-plus"></i> <span>Form Mata Kuliah</span></button>
+      {{/if}}
+      {{#if isInRole 'dosen, admin, superadmin'}}
+      <!-- <button class="btn btn-primary" id="toggleSearch"> <i class="fa fa-search"></i> <span>Search</span></button> -->
+      <button class="btn btn-primary" id="toggleTingkats">
+    {{#if showTingkats }}
+        <span>Tampilkan Semua Mata Kuliah</span>
+    {{else}}
+        <span>Tampilkan Per Tingkatan</span>
+    {{/if}}
+      </button>
+      {{/if}}
+    </div>
+  </section>
+  {{#if showSearch }}
+  {{> searchAcmatkuls }}
+  {{/if}}
+  <section class="section-matkul-list">
+    <h2 class="section-title">Daftar Mata Kuliah</h2>
+    {{#if showTingkats }}
+    <ul class="tingkats-list">
+      {{#each tingkats}}
+      {{#if matkuls }}
+      <li class="block-tingkat">
+        <h3 class="block-title">Tingkat {{ this }}</h3>
+        <ul class="list-group">
+          {{#each matkuls }}
+          <li class="list-group-item name">
+            <a href="/matkul/{{ _id }}">{{ code }} - {{ name }}</a>
+          </li>
+          {{/each}}
+        </ul>
+      </li>
+      {{/if}}
+      {{/each}}
+    </ul>
+    {{else}}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Kode</th>
+          <th>Mata Kuliah</th>
+          <th>Subject</th>
+          <th class="text-right">SKS</th>
+          <th width="100">&nbsp;</th>
+        </tr>
+      </thead>
+      {{#each allMatkuls}}
+      <tr>
+        <td>{{ code }}</td>
+        <td>{{ name }}</td>
+        <td>{{ nameEn }}</td>
+        <td class="text-right">{{ jumlahSKS }}</td>
+        <td><a href="/matkul/{{ _id }}"><i class="fa fa-eye"></i></a></td>
+      </tr>
+      {{/each}}
+    </table>
+    {{/if}}
+  </section>
+</div>
+</template>
+<!-- matkul list -->
+<template name="matkulEdit">
+<div class="page page-matkul-edit">
+  <h1 class="page-title">{{ code }} - {{ name }}</h1>
+  <div class="matkul-edit-form">
+    {{> quickForm id="matkulEdit" collection=formCollection type="update" doc=this }}
+    <button class="btn btn-danger" id="delete-matkul"><i class="fa fa-trash"></i> Delete Matkul</button>
+  </div>
+</div>
+</template>
+<!-- matkul edit -->
+<template name="matkulDetails">
+<div class="page page-matkul-details">
+  <h1 class="page-title">{{ name }} - {{ code }}</h1>
+  {{#if isInRole 'admin, superadmin'}}
+  <section class="section-page-shoulders">
+    <div class="btn-group" role="group" aria-label="command control">
+      <button class="btn btn-primary" id="toggle-matkul-form">Toggle Form Mata Kuliah Aktif</button>
+      <a class="btn btn-warning" href="/matkul/{{ _id }}/edit"> Ubah</a>
+    </div>
+  </section>
+  {{/if}}
+  {{#if activeMatkulForm }}
+  {{> quickForm id="activeMatkulForm" collection=formCollection type="insert" omitFields="students, ujians, rps, bakuls, syllabus, scoringScheme, scores"}}
+  {{else}}
+  {{> activeMatkulsList}}
+  {{/if}}
+</div>
+</template>
+<!-- register matkuls this period -->
+<template name="activeMatkulsList">
+<section class="section-matkuls-list">
+  <h2 class="section-title">Daftar Mata Kuliah Aktif</h2>
+  <ul class="tingkats-list ">
+    {{#each tingkats }}
+    <li class="block-tingkat">
+      <h3 class="block-title">Tingkat {{ this }}</h3>
+      <ul class="matkuls-list list-group">
+        {{#each activeMatkuls}}
+        <li class="list-group-item">
+          <a href="/activeMatkul/{{ _id }}">
+            <div class="item d-flex align-items-justify">
+              <div class="p-2 col name">{{ name }}</div>
+              <div class="p-2 col schedule">{{ scheduleDay }} {{ scheduleTime }}</div>
+              <div class="p-2 col venue">{{ venue }}</div>
+              <div class="p-2 col name dosen-name">{{formatFullname dosenId }}</div>
+              <div class="p-2 col periode-studi">{{ psName }}</div>
+            </div>
+          </a>
+        </li>
+        {{/each}}
+      </ul>
+    </li>
+    {{/each}}
+  </ul>
+</section>
+</template>
+
+
+<template name="activeMatkulDetails">
+<div class="page page-active-matkul-details">
+  <h1 class="page-title">{{ name }} {{ matkulName }}</h1>
+  <section class="section-page-shoulders">
+{{#if isInRole 'dosen, admin, superadmin'}}
+  {{#if ownAcmatkul }}
+    <div class="btn-group" role="group" aria-label="command control">
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/ujianInput"> + Ujian</a>
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/announcementForm"> + Pengumuman</a>
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/meeting/create"> + Pertemuan</a>
+    </div>
+  {{/if}}
+{{/if}}
+    <div class="btn-group" role="group" aria-label="command control">
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/bakuls"> Materi</a>
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/syllabus"> Syllabus</a>
+{{#if isInRole 'dosen, admin, superadmin'}}
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/rps"> RPS</a>
+  {{#if ownAcmatkul }}
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/teachingJournal"> Jurnal</a>
+  {{/if}}
+{{/if}}
+    </div>
+{{#if isInRole 'admin, superadmin'}}
+    <div class="btn-group" role="group" aria-label="command control">
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/attendanceFormPrint" target="_blank"> <i class="fa fa-print"></i> Daftar Hadir</a>
+    </div>
+{{/if}}
+
+    <div class="btn-group" role="group" aria-label="command control">
+{{#if isInRole 'student, dosen, admin, superadmin'}}
+    {{#if ownAcmatkulStudent }}
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/scoreForm"> Tabel Nilai</a>
+    {{/if}}
+{{/if}}
+
+
+{{#if isInRole 'admin, superadmin'}}
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/manageStudents"> Atur Mahasiswa</a>
+{{/if}}
+    </div>
+
+    <div class="btn-group" role="group" aria-label="command control">
+{{#if enrolled }}
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/assessment">+ Evaluasi</a>
+{{/if}}
+
+{{#if ownAcmatkul }}
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/assessmentReport"> Laporan Evaluasi</a>
+      <a class="btn btn-warning" href="/activeMatkul/{{ _id }}/edit"> Ubah</a>
+{{/if}}
+    </div>
+  </section>
+
+  {{> activeMatkulSummary}}
+  {{> acmatkulAnnouncements}}
+
+  <section class="section-page-controls">
+    <div class="d-flex justify-content-center align-items-center">
+      <button data-view-target="0" class="btn btn-primary toggle-view">Daftar Mahasiswa</button>
+      <button data-view-target="1" class="btn btn-primary toggle-view">Daftar Sesi Pertemuan</button>
+      <button data-view-target="2" class="btn btn-primary toggle-view">Daftar Ujian</button>
+    </div>
+  </section>
+
+  {{#if equals viewMode 0 }}
+  <section class="section-matkul-students-list">
+    <h2 class="section-title">Daftar Peserta Kelas</h2>
+    <ul class="list-group">
+      {{#each students}}
+      <li class="list-group-item d-flex">
+        <div class="name">
+          <a href="/student/{{ studentId }}">
+            {{formatFullname studentId }} <span class="label nopokok">{{formatNopokok studentId }}</span>
+          </a>
+        </div>
+      </li>
+      {{/each}}
+    </ul>
+  </section>
+  {{/if}}
+
+  {{#if equals viewMode 1 }}
+  <section class="section-matkul-meetings-list">
+    <h2 class="section-title">Daftar Pertemuan</h2>
+    <ul class="list-group">
+      {{> meetingAmkList }}
+    </ul>
+  </section>
+  {{/if}}
+
+  {{#if equals viewMode 2 }}
+    <section class="section-matkul-meetings-list">
+      <div class="d-flex justify-content-center align-items-middle">
+        <div>
+          <input type="radio" name="ujianOptions" id="pastOption" value="1">
+          <label for="pastOption" style="font-size: 1.5rem;">Ujian Lalu</label>
+        </div>
+        <div>
+          <input type="radio" name="ujianOptions" id="futureOption" value="2" class="ml-5" checked>
+          <label for="futureOption" style="font-size: 1.5rem;">Ujian Mendatang</label>
+        </div>
+      </div>
+      <h2 class="section-title mt-5">
+        {{#if equals selectedUjian '1'}}
+          Daftar Ujian Lalu
+        {{else}}
+          Daftar Ujian Mendatang
+        {{/if}}
+      </h2>
+      <ul class="list-group mt-5">
+        {{> amkUjiansList ujians=ujians}}
+      </ul>
+    </section>
+  {{/if}}
+
+</div>
+</template>
+
+<template name="attendanceFormPrint">
+<div class="page page-attendance-form-print">
+  {{> kopSurat}}
+  <section class="text-left toggle-page-wrapper">
+    <div class="btn-group" role="group" aria-label="command control">
+      <button id="togglePage" class="btn btn-primary toggle-page">Toggle Page 1/2</button>
+    </div>
+  </section>
+  {{> activeMatkulSummary}}
+  <table class="table table-bordered attendance-table">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>No Pokok</th>
+        <th>Nama</th>
+        {{#if page2 }}
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+        <th>4</th>
+        <th>5</th>
+        <th>6</th>
+        <th>7</th>
+        {{ else }}
+        <th>8</th>
+        <th>9</th>
+        <th>10</th>
+        <th>11</th>
+        <th>12</th>
+        <th>13</th>
+        <th>14</th>
+        {{/if}}
+      </tr>
+    </thead>
+    <tbody>
+      {{#each students}}
+      <tr class="">
+        <td width="15">{{ incremented @index }}</td>
+        <td width="30">{{formatNopokok studentId }}</td>
+        <td class="name" width="200">{{formatFullname studentId }}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+</template>
+
+<template name="teachingJournal">
+<div class="page page-teaching-journal-input">
+  <h1 class="page-title">Input Jurnal Pengajaran</h1>
+  {{#if isInRole 'admin, superadmin, dosen'}}
+  <section class="section-page-shoulders">
+    <div class="btn-group" role="group" aria-label="command control">
+      <a class="btn btn-primary" href="/activeMatkul/{{ _id }}/teachingJournal/print" target="_blank"><i class="fa fa-print"></i> Jurnal Pengajaran</a>
+    </div>
+  </section>
+  {{/if}}
+  {{> activeMatkulSummary}}
+  <section class="section-jurnal-input">
+    <!-- {{> quickForm id="tjournalInput" collection=formCollection type="update" schema=formSchema doc=this fields="syllabus,syllabus.$.note" label=this.syllabus.$.topic label="false" }} -->
+    <ul class="list-group syllabus-list">
+      {{#each syllabus}}
+      <li class="list-group-item">
+        <div class="title">{{ topic }}</div>
+        <div class="desc">{{{description}}}</div>
+        <div class="form-group">
+          <textarea name="input-{{ @index }}" id="input-{{ @index }}" cols="30" rows="5" class="form-control input-note" value="{{ note }}" placeholder="Masukkan tgl + catatan pelaksanaan"></textarea>
+          <button class="btn btn-primary submit-note" id="submit">OK</button>
+        </div>
+        <!--         {{#autoForm id=this.topic type="update" collection=formCollection doc=this autosave=true}}
+        {{> afFormGroup name="syllabus.$.note" label=false}}
+        {{/autoForm}} -->
+      </li>
+      {{/each}}
+    </ul>
+  </section>
+</div>
+</template>
+<template name="teachingJournalPrint">
+<div class="page page-teaching-journal-form-print">
+  {{> kopSurat}}
+  <section class="text-right toggle-page-wrapper">
+    <div class="btn-group" role="group" aria-label="command control">
+      <button id="togglePage" class="btn btn-primary toggle-page">Toggle Page 1/2</button>
+    </div>
+  </section>
+  {{> activeMatkulSummary}}
+  <table class="table table-bordered teaching-journal-table">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Tanggal</th>
+        <th>Materi</th>
+        <th>TTD</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#if page2 }}
+      <tr>
+        <td width="10">1</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="10">2</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="10">3</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="10">4</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="10">5</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="10">6</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="10">7</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      {{else}}
+      <tr>
+        <td width="10">8</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="10">9</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="10">10</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="10">11</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="10">12</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="10">13</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="10">14</td>
+        <td width="100">&nbsp;</td>
+        <td>&nbsp;</td>
+        <td width="100">&nbsp;</td>
+      </tr>
+      {{/if}}
+    </tbody>
+  </table>
+</div>
+</template>
+<template name="activeMatkulEdit">
+<div class="page page-active-matkul-edit">
+  <h1 class="page-title">{{ name }}</h1>
+  {{#if isInRole 'dosen, admin, superadmin'}}
+  <div class="matkul-edit-form">
+    {{> quickForm id="matkulEdit" collection=formCollection type="update" doc=this omitFields="students, ujians, syllabus, rps, displayOrder, matkulId, bakuls, scores, scoringScheme" }}
+    <button class="btn btn-danger" id="delete-acmatkul"><i class="fa fa-trash"></i> Delete Active Matkul</button>
+  </div>
+  {{/if}}
+</div>
+</template>
+
+<template name="activeMatkulStudentsForm">
+<div class="page page-acmatkul-students-form">
+  <h1 class="page-title">{{ name }}</h1>
+  <div class="acmatkul-students-form">
+    <!-- {{> quickForm id="matkulStudentsForm" collection=formCollection type="update" doc=this fields="students" }} -->
+    <section class="section-add-students">
+      <div class="panel add-student-amk-form">
+        <h4 class="panel-title">Tambahkan Mahasiswa</h4>
+        <select name="select-student" id="select-student" class="form-control select2">
+          <option value="">== Pilih Mahasiswa ==</option>
+          {{#each allTheStudents}}
+          <option value="{{ studentId }}">{{fullname}} - {{tingkat}}</option>
+          {{/each}}
+        </select>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="button" id="push-student">Tambahkan</button>
+        </div>
+      </div>
+    </section>
+    <section class="section-students">
+      <h2 class="section-title">Daftar Mahasiswa Partisipan</h2>
+      <ul class="list-group">
+        {{#each enrolledStudents}}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <a href="/student/{{ studentId }}">
+            <span class="name">
+              {{#if fullname }}
+              {{fullname}}
+              {{else}}
+              {{formatFullname studentId }}
+              {{/if}}
+            </span>
+            <span class="label tingkat">
+              {{#if tingkat }}
+                {{tingkat}}
+              {{ else }}
+                {{getTingkat studentId }}
+              {{/if}}
+            </span>
+          </a>
+          <div><button class="btn btn-danger delete-student"><i class="fa fa-trash"></i></button></div>
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+    <div class="form-actions">
+      <button class="btn btn-primary btn-block" id="submit-form">Simpan</button>
+    </div>
+  </div>
+</div>
+</template>
+<template name="activeMatkulSummary">
+<section class="section-matkul-summary summary-table">
+  <table class="table-sm summary-table">
+    <tr>
+      <td>Mata Kuliah</td>
+      <td>{{ name }}</td>
+    </tr>
+    <tr>
+      <td>tahun akademik</td>
+      <td>{{formatPs psId }}</td>
+    </tr>
+    <tr>
+      <td>Dosen</td>
+      <td>{{ dosenName }} {{formatFullname dosenId }}</td>
+    </tr>
+    <tr>
+      <td>jadwal</td>
+      <td>{{getDay scheduleDay }} - {{ scheduleTime }}</td>
+    </tr>
+    <tr>
+      <td>Tempat</td>
+      <td>{{ venue }}</td>
+    </tr>
+  </table>
+</section>
+</template>
+<template name="activeMatkulSummaryWM">
+<section class="section-matkul-summary summary-table">
+  <table class="table-sm summary-table">
+    <tr>
+      <td>Nama Mata Kuliah</td>
+      <td>{{ name }} - {{ matkulName }} {{ code }}</td>
+    </tr>
+    <tr>
+      <td>Kode Mata Kuliah</td>
+      <td>{{ code }}/{{ jumlahSKS }}</td>
+    </tr>
+    <tr>
+      <td>Semester/Tahun Akademik</td>
+      <td>{{formatPs psId }}</td>
+    </tr>
+    <tr>
+      <td>Mata Kuliah Pra/ko-syarat</td>
+      <td>{{ prerequisites }}</td>
+    </tr>
+    <tr>
+      <td>Dosen Pengampu</td>
+      <td>{{ dosenName }} {{formatFullname dosenId }}</td>
+    </tr>
+  </table>
+</section>
+</template>
+
+
+
+<template name="myActiveMatkuls">
+<section class="section section-my-active-matkuls">
+  <h2 class="section-title">Daftar Mata Kuliah</h2>
+  {{#if isInRole 'admin, superadmin, dosen'}}
+  <!-- my acmatkuls -->
+  <table class="table table-bordered">
+    <thead>
+      <tr class="table-header">
+        <th class="text-center" colspan="3">Daftar Mata Kuliahku</th>
+      </tr>
+      <tr>
+        <th>Nama Mata Kuliah</th>
+        <th>Jadwal</th>
+        <th>Dosen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#if isInRole 'dosen'}}
+      {{#each myActiveMatkuls}}
+      <tr class="">
+        <td class="name">
+          <a href="/activeMatkul/{{ _id }}">
+            {{ name }} {{ matkulName }} {{ code }}
+          </a>
+        </td>
+        <td class="schedule">{{ scheduleDay }} {{ scheduleTime }}</td>
+        <td class="name dosen-name">{{formatFullname dosenId }}</td>
+      </tr>
+      {{/each}}
+      {{/if}}
+    </tbody>
+  </table>
+  <!-- all acmatkuls -->
+  <table class="table table-bordered">
+    <thead>
+      <tr class="table-header">
+        <th class="text-center" colspan="3">Daftar Mata Kuliah Lainnya</th>
+      </tr>
+      <tr>
+        <th>Nama Mata Kuliah</th>
+        <th>jadwal</th>
+        <th>Dosen</th>
+      </tr>
+    </thead>
+      {{#each tingkats }}
+      {{#if activeMatkuls.length }}
+      <tbody class="tingkat-tbody">
+        <tr class="block-tingkat">
+          <!-- <th colspan="3">Tingkat: {{this}}</th> -->
+          <th colspan="3"><h6>Tingkat: {{this}}</h6></th>
+        </tr>
+        {{#each activeMatkuls}}
+        <tr class="">
+          <td class="name">
+            <a href="/activeMatkul/{{ _id }}">
+              {{ name }} {{ matkulName }} {{ code }}
+            </a>
+          </td>
+          <td class="schedule">{{ scheduleDay }} {{ scheduleTime }}</td>
+          <td class="name dosen-name">{{formatFullname dosenId }}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+      {{/if}}
+      {{/each}}
+  </table>
+
+
+
+  {{ else }}
+  <table class="table table-bordered">
+    <thead>
+      <tr class="table-header">
+        <th>Nama Mata Kuliah</th>
+        <th>jadwal</th>
+        <th>Dosen</th>
+      </tr>
+    </thead>
+
+    <tbody class="tingkat-tbody">
+      {{#each studentActiveMatkuls }}
+      <tr class="block-tingkat">
+        <th colspan="3"><h6>Tingkat: {{ tingkat }}</h6></th>
+      </tr>
+      {{#each matkuls }}
+      <tr class="">
+        <td class="name">
+          <a href="/activeMatkul/{{ _id }}">
+            {{ name }}
+          </a>
+        </td>
+        <td class="schedule">{{ scheduleDay }} {{ scheduleTime }}</td>
+        <td class="name dosen-name">{{formatFullname dosenId }}</td>
+      </tr>
+      {{/each}}
+      {{/each}}
+    </tbody>
+
+
+  </table>
+  {{/if}}
+</section>
+</template>
+
+
+
+<template name="activeMatkulSyllabus">
+<div class="page page-syllabus">
+  <h1 class="page-title">{{ name }} Syllabus</h1>
+  {{> kopSurat }}
+  {{#if isInRole 'admin, superadmin, dosen'}}
+  {{#if ownAcmatkul }}
+  <section class="section-page-shoulders">
+    <div class="btn-group" role="group" aria-label="command control">
+      <button class="btn btn-primary" id="toggle-syl-form">Toggle Syllabus Form</button>
+      <a href="/activeMatkul/{{ _id }}/syllabus/print" class="btn btn-primary" id="print-syl">Print Syllabus</a>
+    </div>
+  </section>
+  {{/if}}
+  {{/if}}
+  {{> activeMatkulSummary}}
+  {{#if showForm }}
+  {{> quickForm id="activeMatkulSyllabusForm" collection=formCollection type="update" fields="syllabus" omitFields="syllabus.$.note" doc=this}}
+  {{ else }}
+  <section class="section-syllabus">
+    <h2 class="section-title">Syllabus</h2>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Topik</th>
+          <th>Bahasan</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each syllabus}}
+        <tr>
+          <td>{{ topic }}</td>
+          <td>{{{ description }}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </section>
+  {{/if}}
+</div>
+</template>
+<template name="activeMatkulRps">
+<div class="page page-rps">
+  <h1 class="page-title">{{ name }} RPS</h1>
+  <section class="section-page-shoulders">
+    <div class="btn-group" role="group" aria-label="command control">
+      <!-- {{#if isInRole 'admin, superadmin'}} -->
+      {{#if mayEdit }}
+      <button class="btn btn-primary" id="toggle-rps-form">Toggle Rps Form</button>
+      {{/if}}
+      {{#if isInRole 'admin, superadmin' }}
+      <a href="/activeMatkul/{{ _id }}/rps/print" class="btn btn-primary" id="print-rps" target="_blank">Print RPS</a>
+      {{/if}}
+    </div>
+  </section>
+  {{> activeMatkulSummary}}
+  {{#if showForm }}
+  <!-- {{> quickForm id="activeMatkulRpsForm" collection=formCollection type="update" fields="rps" omitFields="rps.material" doc=this}} -->
+  <div class="panel panel-default">
+    <form action="" id="rps-edit-form" class="">
+      <div class="form-group"><label for="description">Deskripsi Mata Kuliah</label><textarea name="description" id="description" cols="30" rows="3" class="summernote form-control" value="{{rps.description}}"></textarea></div>
+      <div class="form-group"><label for="objective">Capaian Pembelajaran</label><textarea name="objective" id="objective" cols="30" rows="3" class="summernote form-control" value="{{rps.objective}}"></textarea></div>
+      <div class="form-group"><label for="readings">Sumber Pustaka</label><textarea name="readings" id="readings" cols="30" rows="3" class="summernote form-control" value="{{rps.readings}}"></textarea></div>
+      <div class="form-group"><label for="approach">Rincian Kegiatan</label><textarea name="approach" id="approach" cols="30" rows="3" class="summernote form-control" value="{{rps.approach}}"></textarea></div>
+      <div class="form-group"><label for="tasks">Rincian Tugas</label><textarea name="tasks" id="tasks" cols="30" rows="3" class="summernote form-control" value="{{rps.tasks}}"></textarea></div>
+      <div class="form-group"><label for="assessment">Kriteria Penilaian</label><textarea name="assessment" id="assessment" cols="30" rows="3" class="summernote form-control" value="{{rps.assessment}}"></textarea></div>
+
+      <div class="form-item form-group">
+        <label for="">Upload Scanned RPS</label>
+        {{#if imageFile }}
+        <a href="{{ imageFile.link }}" class="fancybox" data-fancybox="profile" data-caption=""><img src="{{ imageFile.link }}" alt="{{ imageFile.name }}" class="thumbnail"></a>
+        <button class="btn btn-danger remove-image"><i class="fa fa-trash"></i></button>
+        {{/if}}
+        {{#with currentUpload}}
+        Uploading <b>{{file.name}}</b>:
+        <span id="progress">{{progress.get}}%</span>
+        {{else}}
+        <input id="fileInput" type="file" />
+        {{/with}}
+      </div>
+      <div class="form-group form-actions">
+        <button class="btn btn-block btn-primary" id="submit" type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+  {{ else }}
+  <section class="section-rps-cards">
+    <h2 class="section-title">Rencana Pembelajaran Semester</h2>
+    <div class="list-group">
+
+      <div class="list-group-item">
+        <label class="">Deskripsi Mata Kuliah</label>
+        <p class="">{{{ rps.description }}}</p>
+      </div>
+      <div class="list-group-item">
+        <label class="">Capaian Pembelajaran</label>
+        <p class="">{{{ rps.objective }}}</p>
+      </div>
+      <div class="list-group-item">
+        <label class="">Sumber Pustaka</label>
+        <p class="">{{{ rps.readings }}}</p>
+      </div>
+      <div class="list-group-item">
+        <label class="">Rincian Kegiatan</label>
+        <p class="">{{{ rps.approach }}}</p>
+      </div>
+      <div class="list-group-item">
+        <label class="">Rincian Tugas</label>
+        <p class="">{{{ rps.tasks }}}</p>
+      </div>
+      <div class="list-group-item">
+        <label class="">Kriteria Penilaian</label>
+        <p class="">{{{ rps.assessment }}}</p>
+      </div>
+
+      <div class="list-group-item">
+        <label class="">Scanned Upload</label>
+        <div class="uploaded-file">
+          {{#if rps.upload }}
+          <a href="{{ imageFile.link }}" class="fancybox" data-fancybox="profile" data-caption=""><img src="{{ imageFile.link }}" alt="{{ imageFile.name }}" class="thumbnail"></a>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- <section class="section-rps-materials">
+    <h2 class="section-title">Materi Perkuliahan</h2>
+    <ol class="list-group">
+      <li class="list-group-item list-header">Pokok Bahasan</li>
+      {{#each rps.material}}
+      <li class="list-group-item">{{{ description }}}</li>
+      {{/each}}
+    </ol>
+  </section> -->
+  <section class="section-rps-materials">
+    <h2 class="section-title">Materi Perkuliahan</h2>
+    <h6 class="section-title">Syllabus</h6>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Topik</th>
+          <th>Bahasan</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each syllabus}}
+        <tr>
+          <th width="25">{{incremented @index }}</th>
+          <th width="200">{{ topic }}</th>
+          <th>{{{ description }}}</th>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </section>
+  {{/if}}
+</div>
+</template>
+<template name="activeMatkulRpsPrint">
+<div class="page page-rps-print">
+  {{>kopSurat}}
+  <section class="section-rps-cards">
+    <h2 class="section-title"><strong>Rencana Perkuliahan Semester (RPS)</strong></h2>
+    {{> activeMatkulSummaryWM}}
+    <div class="list-group">
+      <div class="list-group-item">
+        <label class="">Deskripsi Mata Kuliah</label>
+        <p class="">{{{ rps.description }}}</p>
+      </div>
+      <div class="list-group-item">
+        <label class="">Capaian Pembelajaran Mata Kuliah</label>
+        <p class="">{{{ rps.objective }}}</p>
+      </div>
+      <div class="list-group-item">
+        <label class="">Sumber Pustaka</label>
+        <p class="">{{{ rps.readings }}}</p>
+      </div>
+      <!-- <div class="list-group-item">
+        <label class="">Pendekatan Perkuliahan</label>
+        <p class="">{{{ rps.approach }}}</p>
+      </div> -->
+      <div class="list-group-item">
+        <label class="">Rincian Kegiatan</label>
+        <p class="">{{{ rps.activities }}}</p>
+      </div>
+      <div class="list-group-item">
+        <label class="">Rincian Tugas</label>
+        <p class="">{{{ rps.tasks }}}</p>
+      </div>
+
+      <!-- <div class="list-group-item">
+        <label class="">referensi pengayaan</label>
+        <p class="">{{{ rps.enrichmentReferences }}}</p>
+      </div> -->
+      <div class="list-group-item">
+        <label class="">Kriteria Penilaian</label>
+        <p class="">{{{ rps.assessment }}}</p>
+      </div>
+      <div class="list-group-item">
+        <table class="table approval-table">
+          <thead>
+            <tr>
+              <th>Dipersiapkan oleh:</th>
+              <th>Diperiksa oleh:</th>
+              <th>Disetujui oleh:</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="sign-here">
+              <td>Dosen</td>
+              <td>Gugus Jamin Mutu</td>
+              <td>Dekan</td>
+            </tr>
+            <tr>
+              <td>Tgl...</td>
+              <td>Tgl...</td>
+              <td>Tgl...</td>
+            </tr>
+          <tr></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<section class="section-rps-materials">
+  <h2 class="section-title">Materi Perkuliahan</h2>
+  <h6 class="section-title">Syllabus</h6>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Topik</th>
+        <th>Bahasan</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each syllabus}}
+      <tr>
+        <th width="25">{{incremented @index }}</th>
+        <th width="200">{{ topic }}</th>
+        <th>{{{ description }}}</th>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</section>
+</div>
+</template>
+<template name="searchAcmatkuls">
+  <section class="section-search section-search-amk">
+    <h2 class="section-title">Cari Mata Kuliah Aktif</h2>
+<div class="searchbox search-acmatkuls">{{> EasySearch.Input index=acmatkulIndex noDocumentsOnEmpty=true attributes=attributes }}</div>
+<ul class="search-results list-group">
+{{#EasySearch.Each index=acmatkulIndex }}
+<li class="list-group-item">
+  <a href="/activeMatkul/{{ _id }}">
+    <div class="item d-flex">
+      <span class="name flex-grow-1">{{ name }}</span>
+      <span class="name flex-shrink-0">{{ psName }}</span>
+    </div>
+  </a>
+</li>
+{{/EasySearch.Each}}
+</ul>
+{{#EasySearch.IfInputEmpty index=acmatkulIndex}}
+<!-- <div class="panel panel-well">Cari mata kuliah disini.</div> -->
+{{/EasySearch.IfInputEmpty}}
+{{#EasySearch.IfNoResults index=acmatkulIndex}}
+<div>Tidak ada hasil pencarian.</div>
+{{/EasySearch.IfNoResults}}
+  </section>
+</template>
+
+
+
+
+<template name="jadwalKuliah">
+<section class="section-matkuls-list">
+  <h2 class="section-title">Jadwal Kuliah</h2>
+{{#if isInRole 'admin, superadmin'}}
+  <section class="section-page-shoulders">
+    <div class="btn-group" role="group" aria-label="command control">
+      <button class="btn btn-primary" id="toggleOrdering"><i class="fa fa-sort-numeric-asc"></i>Urutkan</button>
+    </div>
+  </section>
+{{/if}}
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Nama Mata Kuliah</th>
+      <th>jadwal</th>
+      <th>Dosen</th>
+      {{#if showOrdering }}
+      <th>Atur</th>
+      {{/if}}
+    </tr>
+  </thead>
+
+
+
+
+{{#if showOrdering }}
+  <tbody>
+    {{#each hariKuliahs }}
+    <tr>
+      <th colspan="4">{{ label }}</th>
+    </tr>
+
+    {{#each activeMatkuls}}
+      <tr class="">
+        <td class="name">
+          <a href="/activeMatkul/{{ _id }}">
+            {{ name }} {{ matkulName }} {{ code }}
+          </a>
+        </td>
+        <td class="schedule">{{getDay scheduleDay }} {{ scheduleTime }}</td>
+        <td class="name dosen-name">{{formatFullname dosenId }}</td>
+        {{#if isInRole 'admin, superadmin'}}
+          <td class="text-center">
+            <!-- <span>{{ displayOrder }}</span> -->
+            <div class="btn-group" role="group" aria-label="command control">
+              <button class="btn btn-success fa fa-arrow-up order-up"></button><button class="btn btn-danger fa fa-arrow-down order-down"></button>
+            </div>
+          </td>
+        {{/if}}
+      </tr>
+      {{/each}}
+      <tr>
+        <td colspan="4">&nbsp;</td>
+      </tr>
+      {{/each}}
+  </tbody>
+{{else }}
+
+{{#each hariKuliahs }}
+  <thead>
+    <tr>
+      <th class="header-hari" colspan="3">Hari {{ label }}</th>
+    </tr>
+  </thead>
+
+  {{#each tingkats }}
+    {{#if activeMatkulsInTingkat ../value }}
+    <tbody class="tingkat-tbody">
+      <tr class="block-tingkat">
+        <!-- <th colspan="3">Tingkat: {{this}}</th> -->
+        <th colspan="3"><h6>Tingkat: {{this}} | {{formatTingkatName this }}</h6></th>
+      </tr>
+      {{#each activeMatkulsInTingkat ../value}}
+      <tr class="">
+        <td class="name">
+          <a href="/activeMatkul/{{ _id }}">
+            {{ name }} {{ matkulName }} {{ code }}
+          </a>
+        </td>
+        <td class="schedule">{{ scheduleDay }} {{ scheduleTime }}</td>
+        <td class="name dosen-name">{{formatFullname dosenId }}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+    {{/if}}
+  {{/each}}
+
+{{/each}}
+{{/if}}
+
+
+
+
+</table>
+</section>
+</template>
+
+
+
+<template name="activeMatkulBakul">
+<section class="section-bakuls">
+<h2 class="section-title">Materi Kuliah</h2>
+{{#if isInRole 'admin, superadmin, dosen'}}
+{{#if ownAcmatkul }}
+<section class="section-page-shoulders">
+  <div class="btn-group" role="group" aria-label="command control">
+    <button class="btn btn-primary" id="toggleForm"> Atur Materi Kuliah</button>
+  </div>
+</section>
+{{/if}}
+{{/if}}
+{{#if editMode }}
+{{> quickForm id="activeMatkulBakulEdit" fields="bakuls" collection=formCollection type="update" doc=this}}
+{{else}}
+<ul class="bakuls-list">
+  {{#each bakul in sortedFiles bakuls }}
+  <li class="card">
+    <div class="card-header">{{ bakul.title }}</div>
+    {{#if bakul.description }}<div class="card-body">{{ bakul.description }}</div>{{/if}}
+    <div class="card-footer">
+      <a href="{{getFileLink 1 bakul.file }}" target="_blank" rel="noreferrer" class="btn btn-primary">Unduh</a>
+    </div>
+  </li>
+  {{/each }}
+</ul>
+{{/if}}
+</section>
+</template>
+
+
+
+
+
+
+
+<template name="scoreForm">
+<div class="page page-acmatkul-score-form">
+  <h1 class="page-title">Masukkan Nilai</h1>
+  {{> activeMatkulSummary}}
+  <section class="section-scoreForm">
+    <h2 class="section-title">Tabel Nilai</h2>
+    <p class="text-center">Skema Penilaian: {{getScoringScheme scoringScheme}}</p>
+    {{#if isInRole 'admin, superadmin, dosen'}}
+      {{#if ownAcmatkul }}
+      <section class="section-page-shoulders">
+        <div class="btn-group" role="group" aria-label="command control">
+          <button class="btn btn-primary" id="toggleForm"> Ubah Tabel</button>
+        </div>
+      </section>
+      {{/if}}
+    {{/if}}
+    <form action="" id="score-form">
+      <table class="score-table table">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th class="text-right" width="100">Tugas</th>
+            <th class="text-right" width="100">Quiz</th>
+            <th class="text-right" width="100">UTS</th>
+            <th class="text-right" width="100">UAS</th>
+    {{#unless editMode }}
+            <th class="text-right">Nilai Akhir</th>
+    {{/unless}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each studentScores }}
+          <tr class="score-input score-{{ studentId }}">
+            <th>{{formatFullname studentId }}</th>
+    {{#if editMode }}
+            <td><input type="number" value="{{ tugas }}" class="text-right form-control tugas" name="{{studentId}}-tugas"></td>
+            <td><input type="number" value="{{ quiz }}" class="text-right form-control quiz" name="{{studentId}}-quiz"></td>
+            <td><input type="number" value="{{ uts }}" class="text-right form-control uts" name="{{studentId}}-uts"></td>
+            <td><input type="number" value="{{ uas }}" class="text-right form-control uas" name="{{studentId}}-uas"></td>
+    {{else}}
+            <td class="score text-right">{{ tugas }}</td>
+            <td class="score text-right">{{ quiz }}</td>
+            <td class="score text-right">{{ uts }}</td>
+            <td class="score text-right">{{ uas }}</td>
+            <td class="score text-right"><span class="final-score">{{ calculatedScore }}</span></td>
+    {{/if}}
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    {{#if editMode }}
+      <div class="form-actions">
+        <button class="btn btn-block btn-primary" type="button" id="submit-form">OK</button>
+      </div>
+    {{/if}}
+    </form>
+  </section>
+</div>
+</template>
+
+
+
+<template name="scoreForm2">
+<div class="page page-acmatkul-score-form">
+  <h1 class="page-title">Masukkan Nilai</h1>
+  {{> activeMatkulSummary}}
+  <section class="section-scoreForm">
+    <h2 class="section-title">Tabel Nilai</h2>
+    <p class="text-center">Skema Penilaian: ( STS + SAS ) / 2</p>
+    <!-- <p class="text-center">Skema Penilaian: {{getScoringScheme scoringScheme}}</p> -->
+    {{#if isInRole 'admin, superadmin, dosen'}}
+      {{#if ownAcmatkul }}
+      <section class="section-page-shoulders">
+        <div class="btn-group" role="group" aria-label="command control">
+          <button class="btn btn-primary" id="toggleForm"> Ubah Tabel</button>
+          {{#unless editMode}}
+            <button class="btn btn-primary" id="toggleNotes"> Tampilkan Note</button>
+          {{else}}
+            <button class="btn btn-primary disabled" disabled="disabled"> Tampilkan Note</button>
+          {{/unless}}
+        </div>
+      </section>
+      {{/if}}
+    {{/if}}
+    <form action="" id="score-form">
+      <table class="score-table table">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th class="text-right" width="100">STS</th>
+            <th class="text-right" width="100">SAS</th>
+            <th class="text-right">Nilai Akhir</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each studentScores }}
+              <tr class="score-input score-{{ studentId }}">
+                {{#if editMode }}
+                  <th rowspan="1">
+                    <div>{{formatFullname studentId }}</div>
+                    <div>
+                      <textarea name="{{studentId}}-notes" id="{{studentId}}-notes" cols="30" rows="4" class="form-control" placeholder="Catatan untuk mahasiswa ini..." value="{{ notes }}"></textarea>
+                    </div>
+                  </th>
+                {{else}}
+                  <th rowspan="1"><a href="/student/{{ studentId }}">{{formatFullname studentId }}</a></th>
+                {{/if}}
+                <td class="score text-right">
+                  {{#if hasUTS}}
+                    {{sts}}
+                  {{else}}
+                    No UTS
+                  {{/if}}
+                </td>
+                <td class="score text-right">
+                  {{#if hasUAS}}
+                    {{sas}}
+                  {{else}}
+                    No UAS
+                  {{/if}}
+                </td>
+                <td class="score text-right">
+                  {{#if hasUTS}}
+                    {{#if hasUAS}}
+                      {{finalScore}}
+                    {{else}}
+                      No Final
+                    {{/if}}
+                  {{else}}
+                    No Final
+                  {{/if}}
+                </td>
+              </tr>
+              {{#if editMode }}
+          <!--           <tr>
+                      <td colspan="5">
+                        <label for="{{ studentId }}-notes">Catatan</label>
+                        <textarea name="{{studentId}}-notes" id="{{studentId}}-notes" cols="30" rows="4" class="form-control"></textarea>
+                      </td>
+                    </tr> -->
+              {{else}}
+                  {{#if showNotes }}
+                    <tr class="note">
+                        <td colspan="5">
+                        {{ notes }}
+                      </td>
+                    </tr>
+                  {{/if}}
+              {{/if}}
+          {{/each}}
+        </tbody>
+      </table>
+      {{#if editMode }}
+        <div class="form-actions">
+          <button class="btn btn-block btn-primary" type="button" id="submit-form">OK</button>
+        </div>
+      {{/if}}
+    </form>
+  </section>
+</div>
+</template>
+
+
+
+
+

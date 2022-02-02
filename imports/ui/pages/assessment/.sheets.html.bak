@@ -1,0 +1,404 @@
+<template name="scoringItemGroupForm">
+{{> quickForm id="scoringItemGroupForm" collection=formCollection type="insert"}}
+</template>
+
+<template name="scoringItemGroupsList">
+  <div class="page page-scoring-item-list">
+    <h1 class="page-title">Master Grup Pertanyaan</h1>
+    {{#if isInRole 'admin, superadmin' }}
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <button class="btn btn-primary" id="toggle-scoring-group-form">Toggle Form Grup Pertanyaan</button>
+      </div>
+    </section>
+    {{/if}}
+
+    {{#if isInRole 'formator, admin, superadmin' }}
+
+    {{#if scoringItemGroupForm }}
+      {{> quickForm id="scoringItemGroupForm" collection=formCollection type="insert" omitFields="group" }}
+    {{ else }}
+			<section class="section-scoring-item-list">
+	      <h2 class="section-title">Daftar Semua Grup Pertanyaan</h2>
+	      <ul class="list-group">
+	        {{#each itemGroup }}
+	        <li class="list-group-item">
+	          <span class="name">{{ title }}</span> <span class="float-right"><button class="deleteItem btn btn-danger"><i class="fa fa-trash"></i></button></span>
+	        </li>
+	        {{/each}}
+	      </ul>
+	    </section>
+    {{/if}}
+    {{/if}}
+  </div>
+</template>
+
+<template name="scoringItemForm">
+  {{#if isInRole 'formator, admin, superadmin' }}
+	{{> quickForm id="scoringItemForm" collection=formCollection type="insert"}}
+	{{/if}}
+
+</template>
+<template name="scoringItemsList">
+  {{#if isInRole 'formator, admin, superadmin' }}
+  <div class="page page-scoring-item-list">
+    <h1 class="page-title">Master Pertanyaan</h1>
+    {{#if isInRole 'admin, superadmin' }}
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <button class="btn btn-primary" id="toggle-scoring-form">Toggle Form Pertanyaan</button>
+      </div>
+    </section>
+    {{/if}}
+
+    {{#if scoringItemForm }}
+      {{> quickForm id="scoringItemForm" collection=formCollection type="insert" omitFields="group" }}
+    {{ else }}
+			<section class="section-scoring-item-list">
+	      <h2 class="section-title">Daftar Semua Pertanyaan</h2>
+	      <ul class="list-group">
+	        {{#each scoringItem }}
+	        <li class="list-group-item">
+	          <span class="name">{{ question }}</span> <span class="float-right"><button class="deleteItem btn btn-danger"><i class="fa fa-trash"></i></button></span>
+	        </li>
+	        {{/each}}
+	      </ul>
+	    </section>
+    {{/if}}
+  </div>
+    {{/if}}
+</template>
+
+<template name="itemAnswerForm">
+  {{#if isInRole 'formator, admin, superadmin' }}
+	{{> quickForm id="itemAnswerForm" collection=formCollection type="insert"}}
+	{{/if}}
+</template>
+
+<template name="itemAnswersList">
+  {{#if isInRole 'formator, admin, superadmin' }}
+  <div class="page page-item-answers-page">
+    <h1 class="page-title">Master Jawaban</h1>
+    {{#if itemAnswerForm }}
+      {{> quickForm id="itemAnswerForm" collection=formCollection type="insert" }}
+    {{/if}}
+    {{#if isInRole 'admin, superadmin' }}
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <button class="btn btn-primary" id="toggle-periode-form">Toggle Form Master Jawaban</button>
+      </div>
+    </section>
+    {{/if}}
+    <section class="section-periode-studi-list">
+      <h2 class="section-title">Daftar Pilihan Jawaban</h2>
+      <ul class="list-group">
+        {{#each itemAnswer }}
+        <li class="list-group-item">
+          <span class="name">{{ name }}</span> 
+          <span class="float-right">
+			      <div class="btn-group" role="group" aria-label="command control">
+	          	<a href="/answer/{{ _id }}/edit" class="edit btn btn-warning"><i class="fa fa-pencil"></i></a>
+	          	<button class="deleteAnswer btn btn-danger"><i class="fa fa-trash"></i></button>
+	          </div>
+          </span>
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+  </div>
+  {{/if}}
+</template>
+<template name="scoringTemplateForm">
+{{#if isInRole 'formator, admin, superadmin' }}
+<div class="page page-scoring-template-form">
+	<h1 class="page-title">Scoring Template Form</h1>
+	<div class="scoring-template-form">
+		{{> quickForm id="scoringTemplateForm" collection=formCollection type="insert"}}
+	</div>
+</div>
+{{/if}}
+</template>
+
+<template name="itemAnswerEdit">
+{{#if isInRole 'formator, admin, superadmin' }}
+  {{> quickForm id="itemAnswerEdit" collection=formCollection type="update" doc=this }}
+{{/if}}
+</template>
+
+
+
+<template name="scoringTemplateList">
+{{#if isInRole 'formator, admin, superadmin' }}
+<div class="page page-scoring-template-list">
+	<h1 class="page-title">Scoring Template List</h1>
+	{{#if isInRole 'admin, superadmin' }}
+	<section class="section-page-shoulders">
+		<div class="btn-group" role="group" aria-label="command control">
+			<a href="/scoringTemplateForm/" class="btn btn-primary">Tambahkan Scoring Template</a>
+		</div>
+	</section>
+	{{/if}}
+	<ul class="list-group">
+		{{#each scoringTemplate }}
+		<li class="list-group-item">
+			<a href="/scoringTemplate/{{_id}}">
+				<div class="item">
+					<span class="title">{{ name }}</span>
+				</div>
+			</a>
+		</li>
+		{{/each}}
+	</ul>
+</div>
+{{/if}}
+</template>
+
+
+<template name="scoringTemplateDetails">
+    {{#if isInRole 'formator, admin, superadmin' }}
+
+<div class="page page-scoring-template-details">
+	<h1 class="page-title">{{ name }}</h1>
+	{{#if isInRole 'admin, superadmin' }}
+	<section class="section-page-shoulders">
+		<div class="btn-group" role="group" aria-label="command control">
+			<a href="/scoringTemplate/{{ _id }}/edit" class="btn btn-warning">Edit</a>
+		</div>
+	</section>
+	{{/if}}
+	<section class="section-template-item-list">
+		<h2 class="section-title">Scoring Item List</h2>
+		<ul class="scoring-item-group list-group">
+		{{#each scoringItemGroup}}
+			<li class="list-group-item">
+				<h3 class="block-title">{{ thisGroup.title }}</h3>
+				<ul class="scoring-item-list">
+					{{#each scoringItem}}
+					<li>
+						{{question}}
+					</li>
+					{{/each}}
+				</ul>
+			</li>
+		{{/each}}
+		</ul>
+	</section>
+		<section class="section-template-note">
+			<h2 class="section-title">Template Note</h2>
+			<div>{{note}}</div>
+		</section>
+		<section class="section-other-info">
+			<table>
+				<tr>
+					<td>Digunakan di tingkat</td>
+					<td>
+						{{#each tingkat }}
+						<span class="badge badge-primary tingkat">{{ name }}</span>
+						{{/each}}
+					</td>
+				</tr>
+			</table>
+		</section>
+</div>
+{{/if}}
+</template>
+
+
+
+<template name="scoringTemplateEdit">
+    {{#if isInRole 'formator, admin, superadmin' }}
+
+	<div class="page page-scoring-template-edit">
+		{{> quickForm id="scoringTemplateEdit" collection=formCollection type="update" doc=this }}
+		<button class="delete btn btn-danger"><i class="fa fa-trash"></i> delete</button>
+	</div>
+	{{/if}}
+
+</template>
+
+
+<template name="scoreSheetForm">
+
+{{#if yetAssessed }}
+<div class="page page-sheet-form">
+	<section class="section-form">
+		<h2 class="section-title text-center">Form Penilaian <span class="name">{{formTemplate.name}}</span></h2>
+		<form action="" id="sheetForm">
+		<div class="item-group-list scoring-item-group-list list-unstyled">
+			{{#each itemGroup}}
+			<fieldset class="item-group">
+				<h3 class="group-title"><span class="title">{{ thisGroup.title }}</span></h3>
+				<ul class="list-unstyled">
+					{{#each scoringItem}}
+					<li class="card answer-card" id="{{itemId}}">
+						<div class="card-header bg-primary">
+							<div class="name">{{ question }}</div>
+							{{#if isInRole 'superadmin'}}
+							<!-- <button class="btn btn-primary test-question">test</button> -->
+							{{/if}}
+						</div>
+						<div class="card-body">
+							<div class="answers-list row">
+								{{#each answers}}
+								<div class="radio-wrapper col-sm-12 col-md-3">
+									<input type="radio" name="{{ ../itemId }}-{{ ../../groupId }}" id="answer-{{ ../itemId }}-{{ @index }}" value="{{ value }}" class="item-answer" data-question="{{../question}}" data-groupid="{{ ../../groupId }}">
+									<label for="answer-{{ ../itemId }}-{{ @index }}">{{ name }}</label>
+								</div>
+								{{/each}}
+							</div>
+						</div>
+					</li>
+					{{/each}}
+				</ul>
+				<div class="group-notes">
+					<label for="">Catatan {{ thisGroup.title }}</label>
+					<textarea name="groupnote-{{groupId}}-note" id="{{ groupId}}-note" cols="30" rows="4" class="form-control"></textarea>
+				</div>
+			</fieldset>
+			{{/each}}
+		</div>
+		{{#if isInRole 'formator, admin, superadmin' }}
+		<section class="section-formator-note">
+			<label for="">Rekomendasi Formator</label>
+			<div class="form-check radio-wrapper">
+			  <input class="form-check-input" type="radio" name="rekomendasi-formator" id="rekomendasi-formator-pass" value="true" checked>
+			  <label class="form-check-label" for="rekomendasi-formator-pass">
+			    Bisa Lanjut
+			  </label>
+			</div>
+			<div class="form-check radio-wrapper">
+			  <input class="form-check-input" type="radio" name="rekomendasi-formator" id="rekomendasi-formator-fail" value="false">
+			  <label class="form-check-label" for="rekomendasi-formator-fail">
+			    Tidak Bisa Lanjut
+			  </label>
+			</div>
+			<div class="form-group">
+				<label for="">Catatan Formator</label>
+				<textarea name="formator-note" id="formator-note" cols="30" rows="4" class="catatan-formator form-control"></textarea>
+			</div>
+		</section>
+		{{/if}}
+		<div class="form-actions">
+			<button class="btn-primary btn btn-block" id="submit-scoresheet-form" type="submit">OK</button>
+		</div>
+	</form>
+	</section>
+</div>
+{{else}}
+<div class="page page-already-submitted">
+	<div class="no-stuffs panel panel-well">
+		<p>Sorry, Anda udah pernah memberikan penilaian pada periode ini pada {{formatHRDT assessedOn }}.</p>
+	</div>
+</div>
+{{/if}}
+</template>
+
+
+<template name="scoreSheetDetails">
+    {{#if isInRole 'formator, admin, superadmin' }}
+
+	<div class="page page-scoresheet-details">
+		<h1 class="page-title">{{ scoreSheetName }}</h1>
+		{{#if isInRole 'admin, superadmin'}}
+		<section class="section-page-shoulders">
+			<div class="btn-group" role="group" aria-label="command control">
+				<button class="btn btn-warning" id="toggleScoreSheetEdit">Edit</button>
+			</div>
+		</section>
+		{{/if}}
+		{{#if editMode }}
+		<section class="section-scoresheet-edit">
+			<h2 class="section-title">Edit Scoresheet</h2>
+			{{> quickForm id="scoreSheetEdit" collection=formCollection type="update" doc=this }}
+		</section>
+		{{else}}
+		<section class="section-scoresheet-info">
+		<ul class="list-group-item info-list">
+			<li class="list-group-item row">
+				<div class="col-sm-6">created by</div>
+				<div class="col-sm-6">{{ createdByName }}</div>
+			</li>
+			<li class="list-group-item row">
+				<div class="col-sm-6">timestamp</div>
+				<div class="col-sm-6">{{formatHRDT timestamp}}</div>
+			</li>
+			<li class="list-group-item row">
+				<div class="col-sm-6">Subject Name</div>
+				<div class="col-sm-6">{{subjectName}}</div>
+			</li>
+			<li class="list-group-item row">
+				<div class="col-sm-6">Subject Tingkat</div>
+				<div class="col-sm-6">{{subjectTingkat}}</div>
+			</li>
+			<li class="list-group-item row">
+				<div class="col-sm-6">Template</div>
+				<div class="col-sm-6">{{templateName}}</div>
+			</li>
+		</ul>
+		</section>
+		<section class="section-scoresheet-data">
+			<h2 class="section-title">Isi ScoreSheet</h2>
+		<ul class="list-group-item score-list">
+			{{#each formData}}
+			<li class="list-group-item">
+				<div class="group-title">{{ groupTitle }}</div>
+				<div class="item-question">{{ itemQuestion }}</div>
+				<div class="item-value">{{ value }}</div>
+				<div class="item-value-label">{{formatAnswer value }}</div>
+			</li>
+			{{/each}}
+		</ul>
+	</section>
+	<section class="section-rekomendasi-formator">
+		
+	</section>
+		{{/if}}
+	</div>
+	{{/if}}
+</template>
+
+<template name="mySubmittedSheets">
+<div class="page page-submitted-sheets">
+	<h1 class="page-title">My Submitted Sheets</h1>
+	<section class="section-sheets-list">
+		<ul class="list-group sheets-list">
+			{{#each sheet}}
+			{{> sheetItem}}
+			{{/each}}
+		</ul>
+	</section>
+</div>
+</template>
+<template name="sheetItem">
+<li class="list-group-item">
+	<a href="/sheet/{{ _id }}">
+		<div class="item card">
+			<div class="card-header">
+				<span class="title">{{ userId }}</span>
+			</div>
+			<div class="card-body">
+				<dl class="row">
+					<dt class="col-sm-3">Submitted By</dt>
+					<dd class="col-sm-9">{{ userId }}</dd>
+					<dt class="col-sm-9">Scoring Subject</dt>
+					<dd class="col-sm-9">{{ subjectId }}</dd>
+				</dl>
+			</div>
+			<div class="card-footer text-muted">
+				<span class="date">{{ createdAt }}</span>
+				<span class="date">{{ lastEdited }}</span>
+			</div>
+		</div>
+	</a>
+</li>
+</template>
+
+<template name="scoreSheetList">
+    {{#if isInRole 'formator, admin, superadmin' }}
+
+<div class="page page-score-sheet-list">
+	score sheets list
+</div>
+{{/if}}
+</template>
+

@@ -1,0 +1,49 @@
+
+<template name="blogCreate">
+  <div class="page page-blog-create">
+    <h1 class="page-title">Blog Create</h1>
+      {{> quickForm id="blogForm" collection=formCollection type="insert" }}
+  </div>
+</template>
+
+<template name="blogEdit">
+  <div class="page page-blog-edit">
+    <h1 class="page-title">Blog Edit</h1>
+      {{> quickForm id="blogEdit" collection=formCollection type="update" doc=this }}
+  </div>
+</template>
+
+<template name="blogsList">
+  <div class="page page-blog-list">
+    <h1 class="page-title">Blogs List</h1>
+    <ul class="list-group">
+      {{#each blogs}}
+      <li class="list-group-item">
+        <a href="/blog/{{ _id }}">
+          <div class="item d-flex">
+            <div class="title">{{ title }}</div>
+            <div class="author">{{ author }}</div>
+            <div class="createdAt">{{formatHRDate createdAt }}</div>
+          </div>
+        </a>
+      </li>
+      {{/each}}
+    </ul>
+  </div>
+</template>
+
+
+<template name="blogDetails">
+  <div class="page page-blog-details">
+    <h1 class="page-title">{{ title }}</h1>
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="">
+        <a href="/blog/create" class="btn btn-primary">+ Blog</a>
+        <a href="/blog/{{ _id }}/edit" class="btn btn-warning">Edit</a>
+      </div>
+    </section>
+    <div class="content">
+      {{{ content }}}
+    </div>
+  </div>
+</template>

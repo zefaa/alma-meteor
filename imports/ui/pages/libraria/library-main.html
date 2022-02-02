@@ -1,0 +1,154 @@
+<template name="libraryBase">
+  <div class="appContainer {{ currentUser.username }}">
+  {{#if currentUser }}
+    <header>
+      {{> libraryNavigation}}
+    </header>
+    <main class="container-fluid main-content">
+      {{> yield }}
+    </main>
+    <footer>
+      {{> footer }}
+    </footer>
+    {{else}}
+    <div class="page page-login">
+        <div class="user-icon"><i class="fa fa-user"></i></div>
+        <div class="login-container">
+          {{> loginButtons}}
+        </div>
+    </div>
+    {{/if}}
+  </div>
+</template>
+
+
+
+<template name="libraryStationBase">
+  <div class="appContainer {{ currentUser.username }}">
+  {{#if currentUser }}
+    <header>
+      {{> libraryNavigation}}
+    </header>
+    <main class="container-fluid main-content">
+      {{> yield }}
+    </main>
+    <footer>
+      {{> footer }}
+    </footer>
+    {{else}}
+    <div class="page page-login">
+      <div class="user-icon"><i class="fa fa-user"></i></div>
+      <div class="login-container">
+        {{> loginButtons}}
+      </div>
+    </div>
+    {{/if}}
+  </div>
+</template>
+
+
+<template name="libraryStationHome">
+  <div class="page page-library-station-home">
+    <div class="select-page">
+      <button class="btn btn-primary" id="setBorrow">Peminjaman</button>
+      <button class="btn btn-primary" id="setReturn">Pengembalian</button>
+    </div>
+    {{#if borrowingForm }}
+      {{> stationBorrowForm }}
+    {{else }}
+      {{> stationReturnForm }}
+    {{/if}}
+  </div>
+</template>
+
+
+<template name="stationBorrowForm">
+  <div class="page-borrow-form page">
+    <h1 class="page-title">Form Peminjaman</h1>
+{{#if searchUser }}
+    <section class="section-search-student">
+      <h2 class="section-title">Identitas Anda</h2>
+        {{> searchStudentLibraria}}
+    </section>
+{{ else }}
+    <section class="section-books">
+      <fieldset class="fieldset">
+        <legend>Hello, <span class="name">{{ username }}</span>! <button class="btn btn-link text-danger" id="cancel-user"><i class="fa fa-times-circle"></i></button></legend>
+          {{> searchBook }}
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend>Daftar Buku Dipinjam</legend>
+        <ul class="list-group">
+          {{#each bookBorrowing}}
+          <li class="list-group-item">
+            <div class="item d-flex flex-row justify-content-between align-items-center">
+              <div class="book-title title">{{ title }}</div>
+              <div class="author">{{ author }}</div>
+              <div class="publisher">{{ publisher }}, {{ year }}</div>
+              <div class="item-actions">
+                <button class="remove-item btn btn-link text-danger"><i class="fa fa-times-circle"></i></button>
+              </div>
+            </div>
+          </li>
+          {{/each}}
+        </ul>
+      </fieldset>
+      <div class="form-group form-actions">
+        <button class="btn btn-primary" id="submit-borrow-form">OK</button>
+      </div>
+    </section>
+{{/if}}
+  </div>
+</template>
+
+
+<template name="libraryNavigation">
+  <div class="container-fluid">
+    <nav class="row header-nav">
+      <a href="javascript:;" class="col-4" id="historyBack">
+        <i class="fa fa-chevron-left"></i>
+        <span> Back</span>
+      </a>
+      <a href="{{pathFor route='home'}}" class="col text-center">
+        Home <i class="fa fa-home"></i>
+      </a>
+      <a href="{{pathFor route='mainMenu'}}" class="col-4">
+        <i class="fa fa-bars"></i>
+      </a>
+    </nav>
+  </div>
+</template>
+
+
+<template name="stationReturnForm">
+  <div class="page page-return-form">
+    <h1 class="page-title">Form Pengembalian</h1>
+{{#if searchUser }}
+    <section class="section-search-student">
+      <h2 class="section-title">Identitas Anda</h2>
+        {{> searchStudentLibraria}}
+    </section>
+{{ else }}
+    <section class="section-books">
+      <form action="" id="book-return-form">
+      <fieldset class="fieldset">
+        <legend>Hello, <span class="name">{{ username }}</span>! <button class="btn btn-link text-danger" id="cancel-user"><i class="fa fa-times-circle"></i></button></legend>
+        <ul class="borrowed-list list-group">
+          {{#each borrowedBook}}
+          <li class="list-group-item d-flex flex-row justify-content-between align-items-center return-this-book">
+            <div class="book-title title">{{ title }}</div>
+            <div class="author">{{ author }}</div>
+            <div class="publisher">{{ publisher }}, {{ year }}</div>
+            <div><input type="checkbox" name="{{ title }}" value="{{ _id }}"></div>
+          </li>
+          {{/each}}
+        </ul>
+      </fieldset>
+      <div class="form-group form-actions">
+        <button class="btn btn-primary" id="submit-return-form">OK</button>
+      </div>
+    </form>
+    </section>
+{{/if}}
+  </div>
+</template>

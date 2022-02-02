@@ -1,0 +1,241 @@
+<template name="configSuper">
+  {{#if isInRole 'superadmin'}}
+    {{#if stillLoading }}
+      {{> nowLoading}}
+    {{else}}
+      <div class="page page-config-super">
+        <h1 class="page-title">Config Super</h1>
+        <section class="section-migrate">
+          <h2 class="section-title">Migrate</h2>
+          <button class="btn btn-primary" id="migrasiAppProfiles">Migrasi AppProfiles</button>
+          <button class="btn btn-primary" id="tempDataRun">Jalankan tempData</button>
+          <!-- <button class="btn btn-primary" id="cobaRoles">Coba-coba Roles</button>
+          <button class="btn btn-primary" id="initiateRoles">Inisiasi Roles</button> -->
+          <!-- <div class="form-group mt-3">
+            <label for="">Nama Role Alanning</label>
+            <input type="text" id="alanningRoleName" name="alanningRoleName" placeholder="Nama Role Alanning" class="form-control">
+          </div>
+          <button class="btn btn-primary" id="alanningAdd">Alanning Roles Baru</button> -->
+          <!-- <button class="btn btn-primary" id="alanningRemove">Alanning Roles Hapus</button> -->
+        </section>
+        {{#if isInRole 'tiPenjawab'}}
+          tiPenjawab OK
+        {{/if}}
+        {{#if isUserInRole 'tiEditor'}}
+          tiEditor OK
+        {{/if}}
+        {{#if isUserInRole 'tiAdmin'}}
+          tiAdmin OK
+        {{/if}}
+      </div>
+    {{/if}}
+  {{/if}}
+</template>
+
+<template name="mainUserList">
+  <div class="page page-user-center">
+    <div class="page-header"><h1>Daftar User Alma Next</h1></div>
+
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+          <a href="{{ pathFor route='mainUserCreate' }}" class="btn btn-primary">+ User Baru</a>
+      </div>
+      <!-- <p class="mt-3">
+        <button class="btn btn-primary" id="peserta-cim">Peserta CIM</button>
+        <button class="btn btn-primary" id="user-ti">User Tanya Ivan</button>
+      </p> -->
+    </section>
+    <ul class="list-group">
+      {{#each dataList }}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <a class="title name">{{ fullname }}</a>
+          <div class="flex-shrink">
+            <a href="{{ pathFor route='mainUserEdit' _id=_id }}" class="btn btn-primary text-white">Ubah</a>
+          </div>
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+</template>
+
+<template name="mainUserCreate">
+  {{#if isInRole 'superadmin' }}
+    <div class="page page-create-dosen">
+      <h1 class="page-title">User Alma Next Baru</h1>
+      {{>mainUserForm submitType=1}}
+    </div>
+  {{else}}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="mainUserEdit">
+  {{#if isInRole 'superadmin' }}
+    <div class="page page-create-dosen">
+      <h1 class="page-title">User Alma Next Edit</h1>
+      {{>mainUserForm submitType=2}}
+    </div>
+  {{else}}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="mainUserForm">
+  <form action="" id="create-dosen-form">
+    <div class="form-group">
+      <label for="">Nama Lengkap</label>
+      <input type="text" id="inputName" name="inputName" placeholder="Nama Lengkap" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="">Email</label>
+      <input type="email" id="inputEmail" name="inputEmail" placeholder="Email" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="" class="text-left">Outlet</label>
+      {{#each outlets}}
+        <div class="form-check">
+            <input type="checkbox" name="" class="form-check-input outlet"
+                style="margin-left: -1.25rem; margin-top: 0.3rem;" id="outlet-{{code}}">
+            <label for="outlet-{{code}}" class="form-check-label">{{name}} - {{code}}</label>
+        </div>
+      {{/each}}
+    </div>
+    <div class="form-group">
+      <label for="">Status</label>
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input outlet"
+            style="margin-left: -1.25rem; margin-top: 0.3rem;" id="is-superadmin">
+        <label for="is-superadmin" class="form-check-label">Superadmin</label>
+      </div>
+    </div>
+    {{#if equals isSuperAdmin false}}
+      <div class="form-group">
+        <label>Pilih Roles</label>
+        <select name="parent-roles" id="parent-roles" class="select2 form-control" multiple>
+        </select>
+      </div>
+    {{/if}}
+    <div class="d-flex">
+      <button class="btn btn-primary ml-auto" id="submit-data">Simpan</button>
+    </div>
+  </form>
+</template>
+
+<template name="roleList">
+  <div class="page page-user-center">
+    <div class="page-header"><h1>Daftar Role Alma Next</h1></div>
+
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+          <a href="{{ pathFor route='roleCreate' }}" class="btn btn-primary">+ Role Baru</a>
+      </div>
+    </section>
+    <ul class="list-group">
+      {{#each dataList }}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <a class="title name">{{ name }}</a>
+          <div class="flex-shrink">
+            <a href="{{ pathFor route='roleEdit' _id=_id }}" class="btn btn-primary text-white">Ubah</a>
+          </div>
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+</template>
+
+<template name="roleCreate">
+  {{#if isInRole 'superadmin' }}
+    <div class="page page-create-dosen">
+      <h1 class="page-title">Role Alma Next Baru</h1>
+      {{>roleForm submitType=1}}
+    </div>
+  {{else}}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="roleEdit">
+  {{#if isInRole 'superadmin' }}
+    <div class="page page-create-dosen">
+      <h1 class="page-title">Role Alma Next Edit</h1>
+      {{>roleForm submitType=2}}
+    </div>
+  {{else}}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="roleForm">
+  <form action="" id="create-dosen-form">
+    <div class="form-group">
+      <label for="">Nama Role</label>
+      <input type="text" id="inputName" name="inputName" placeholder="Nama Role" class="form-control">
+    </div>
+    <div class="d-flex">
+      <div class="d-flex flex-column">
+        <p for="">
+          Content Management Service (CMS)
+        </p>
+        <table border="1">
+          {{#each tempRole 'cms'}}
+            <tr>
+              <td>
+                <p class="mt-3 mb-3 ml-3">
+                  {{name}}
+                </p>
+              </td>
+              <td>
+                <input type="checkbox" id="{{code}}" checked="{{checked}}"
+                        class="ml-2 mr-2 feature-checkbox" style="transform: scale(1.5);">
+              </td>
+            </tr>
+          {{/each}}
+        </table>
+      </div>
+      <div class="d-flex flex-column ml-5">
+        <p for="">
+          Centrum Ivan Merz LMS
+        </p>
+        <table border="1">
+          {{#each tempRole 'cim'}}
+            <tr>
+              <td>
+                <p class="mt-3 mb-3 ml-3">
+                  {{name}}
+                </p>
+              </td>
+              <td>
+                <input type="checkbox" id="{{code}}" checked="{{checked}}"
+                        class="ml-2 mr-2 feature-checkbox" style="transform: scale(1.5);">
+              </td>
+            </tr>
+          {{/each}}
+        </table>
+      </div>
+      <div class="d-flex flex-column ml-5">
+        <p for="">
+          KOMSOS
+        </p>
+        <table border="1">
+          {{#each tempRole 'komsos'}}
+            <tr>
+              <td>
+                <p class="mt-3 mb-3 ml-3">
+                  {{name}}
+                </p>
+              </td>
+              <td>
+                <input type="checkbox" id="{{code}}" checked="{{checked}}"
+                        class="ml-2 mr-2 feature-checkbox" style="transform: scale(1.5);">
+              </td>
+            </tr>
+          {{/each}}
+        </table>
+      </div>
+    </div>
+    <div class="d-flex">
+      <button class="btn btn-primary ml-auto" id="submit-data">Simpan</button>
+    </div>
+  </form>
+</template>
+

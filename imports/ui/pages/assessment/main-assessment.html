@@ -1,0 +1,34 @@
+<template name="homeAssessment">
+  <div class="page page-home home-assessment">
+  {{#if isInRole 'student' }}
+    <!-- daftar acmatkul student-->
+    <section class="section-course-assessment">
+      <h2 class="section-title">Course Assessment</h2>
+      <ul class="list-group">
+        {{#each myAcmatkuls}}
+        <li class="list-group-item">
+          <a href="/activeMatkul/{{ _id }}/assessment">{{ name }}</a>
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+  {{/if}}
+
+  {{#if isInRole 'dosen' }}
+    <!-- daftar acmatkul dosen -->
+    <section class="section-course-assessment">
+      <h2 class="section-title">Course Assessment</h2>
+      <ul class="list-group">
+        {{#each dosenAcmatkuls}}
+        <li class="list-group-item">
+          <a href="/activeMatkul/{{ _id }}/assessment">{{ name }}</a>
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+  {{/if}}
+  </div>
+</template>
+
+
+

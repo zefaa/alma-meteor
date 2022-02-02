@@ -1,0 +1,576 @@
+<head>
+  <title>ALMA | Portal Mahasiswa IMAVI</title>
+  <meta http-equiv="cleartype" content="on">
+  <meta name="MobileOptimized" content="480">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <link rel="apple-touch-icon-precomposed" sizes="57x57" href="http://alma.imavi.org/assets/icons/apple-touch-icon-57x57.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="http://alma.imavi.org/assets/icons/apple-touch-icon-120x120.png" />
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="http://alma.imavi.org/assets/icons/apple-touch-icon-152x152.png" />
+  <link rel="icon" type="image/png" href="http://alma.imavi.org/assets/icons/favicon-196x196.png" sizes="196x196" />
+  <link rel="icon" type="image/png" href="http://alma.imavi.org/assets/icons/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="http://alma.imavi.org/assets/icons/favicon-16x16.png" sizes="16x16" />
+  <meta name="application-name" content="IMAVI Portal Mahasiswa"/>
+  <meta name="msapplication-TileColor" content="#FFFFFF" />
+  <meta name="msapplication-square150x150logo" content="http://alma.imavi.org/assets/icons/mstile-150x150.png" />
+  <meta name="msapplication-square310x310logo" content="http://alma.imavi.org/assets/icons/mstile-310x310.png" />
+
+  <link href="https://fonts.googleapis.com/css?family=Karla" rel="stylesheet">
+
+  <style>
+    @media print {
+      .printContainer {
+        width: 95%;
+        margin: auto;
+      }
+      .btn-print, .section-page-shoulders {
+        display: none;
+        visibility: hidden;
+      }
+    }
+  </style>
+</head>
+
+<body>
+</body>
+
+<template name="printLayout">
+  <div class="printContainer">
+    {{> yield}}
+  </div>
+</template>
+
+<template name="base">
+  <div class="appContainer {{ currentUser.fullname }}">
+    {{#if currentUser }}
+    <header>
+      {{> navigation}}
+    </header>
+    <main class="container-fluid main-content">
+      {{> yield }}
+    </main>
+    <footer>
+      {{> footer }}
+    </footer>
+    {{else}}
+    <div class="page page-login">
+      <div class="logo text-center d-flex justify-content-center align-items-center flex-column flex-md-row">
+        <div class="p-2 logo-image"><img src="assets/logo.png" alt=""></div>
+        <!-- <div class="p-2 logo-title"><h1>Institutum Theologicum<br>Ioannis Maria Vianney <br>Surabayanum</h1></div> -->
+      </div>
+      <div class="login-container">
+        <div class="user-icon"><i class="fa fa-user"></i></div>
+        {{> loginButtons}}
+      </div>
+      <div class="home-links">
+        <ul>
+          <li><a class="btn btn-primary" href="https://www.imavi.org"><i class="fa fa-home"></i> Beranda Imavi</a></li>
+          <li><a class="btn btn-primary" href="https://libraria.imavi.org"><i class="fa fa-book"></i> Libraria</a></li>
+        </ul>
+      </div>
+    </div>
+    {{/if}}
+  </div>
+</template>
+
+<template name="reportBase">
+  <div class="appContainer {{ currentUser.fullname }}">
+{{#if currentUser }}
+  <header>
+    {{> navigation}}
+  </header>
+  <main class="main-content report-content">
+  {{#if isInRole 'formator, admin, superadmin' }}
+    {{> yield }}
+  {{ else }}
+    {{> notAuthorized }}
+  {{/ if}}
+  </main>
+  <footer>
+    {{> footer }}
+  </footer>
+  {{else}}
+    {{> loginButtons}}
+  {{/if}}
+</div>
+</template>
+
+
+<template name="footer">
+  <div class="imavi-links">
+    <ul class="list-unstyled unstyled d-flex justify-content-center align-self-center align-items-center">
+      <li><a href="https://libraria.imavi.org" class="btn btn-primary"><i class="fa fa-book"></i> Libraria</a></li>
+    </ul>
+  </div>
+  <div class="row d-flex align-items-center">
+    <div class="copyright col">&copy; 2018 Institutum Theologicum Ioannis Mariae Vianney Surabayanum</div>
+  </div>
+</template>
+
+
+<template name="navigation">
+  <div class="container-fluid">
+    <nav class="row header-nav">
+      <a href="javascript:;" class="col-4" id="historyBack">
+        <i class="fa fa-chevron-left"></i>
+        <span> Back</span>
+      </a>
+      <a href="{{pathFor route='home'}}" class="col text-center">
+        <span class="name">{{operatorUsername}}</span> <i class="fa fa-home"></i>
+      </a>
+      <a href="{{pathFor route='mainMenu'}}" class="col-4">
+        <i class="fa fa-bars"></i>
+      </a>
+    </nav>
+  </div>
+</template>
+
+
+
+
+
+
+<template name="home">
+  <div class="page page-home">
+  {{#if isInRole 'admin' }}
+    {{> homeAdmin }}
+  {{else}}
+    {{> homeSiakad}}
+  {{/if}}
+  </div>
+</template>
+
+
+
+
+
+
+<template name="homeAdmin">
+
+  {{#if isInRole 'admin, superadmin' }}
+  <div class="page page-home-admin">
+    <nav class="home-admin-menu">
+      <div class="menu-item">
+        <a href="/createStudent" class=" btn btn-primary btn-block">
+          <i class="fa fa-user-plus"></i> Mahasiswa Baru
+        </a>
+      </div>
+      <div class="menu-item">
+        <a href="/createDosen" class=" btn btn-primary btn-block">
+          <i class="fa fa-user-plus"></i> Dosen Baru
+        </a>
+      </div>
+      <div class="menu-item">
+        <a href="/userCenter" class=" btn btn-primary btn-block">
+          <i class="fa fa-users"></i> Daftar Dosen
+        </a>
+      </div>
+      <div class="menu-item">
+        <a href="/userCenter" class=" btn btn-primary btn-block">
+          <i class="fa fa-users"></i> Daftar Mahasiswa
+        </a>
+      </div>
+    </nav>
+  </div>
+    {{> homeSiakad}}
+  {{/if}}
+</template>
+
+
+
+
+
+<template name="homeSiakad">
+  <div class="page page-home home-siakad">
+    <section class="section-page-navigation text-center">
+    <div class="btn-group" role="group" aria-label="command control">
+      <button data-view-nav-target="2" class="btn btn-primary toggle-nav-view"><i class="fa fa-bullhorn"></i> Pengumuman</button>
+      <button data-view-nav-target="0" class="btn btn-primary toggle-nav-view"><i class="fa fa-calendar"></i> Jadwal Kuliah</button>
+      <button data-view-nav-target="1" class="btn btn-primary toggle-nav-view"><i class="fa fa-list"></i> Daftar Mata Kuliahku</button>
+      <button data-view-nav-target="3" class="btn btn-primary toggle-nav-view"><i class="fa fa-list"></i> Pertemuan</button>
+    </div>
+  </section>
+
+  {{#if equals viewNavMode 0 }}
+    {{> jadwalKuliah }}
+  {{/if}}
+
+  {{#if equals viewNavMode 1 }}
+    {{> myActiveMatkuls }}
+  {{/if}}
+
+  {{#if equals viewNavMode 2 }}
+    {{> myActiveAnnouncements }}
+  {{/if}}
+
+  {{#if equals viewNavMode 3 }}
+    {{> myMeetings}}
+  {{/if}}
+
+  </div>
+</template>
+
+
+
+
+
+
+
+
+<template name="homeStudent">
+  {{#if isInRole 'student' }}
+  <div class="page page-home-admin">
+    <nav class="home-admin-menu">
+      <div class="menu-item">
+        <a href="{{pathFor route='homeSiakad'}}" class=" btn btn-primary btn-block">
+          Daftar Mata Kuliah
+        </a>
+      </div>
+      <div class="menu-item">
+        <a href="/student/{{ currentUser._id }}/krs" class=" btn btn-primary btn-block">
+          KRS
+        </a>
+      </div>
+      <div class="menu-item">
+        <a href="/periodeStudi/{{ currentPsId }}" class=" btn btn-primary btn-block">
+          Jadwal Kuliah
+        </a>
+      </div>
+    </nav>
+  </div>
+  {{/if}}
+</template>
+
+
+<template name="helpIndexSiakad">
+  <section class="section-help-index">
+    <h2 class="section-title">Siakad Help</h2>
+    <div class="help-item">
+      <ol>
+      {{#if isInRole 'admin, superadmin' }}
+        <li>Pastikan tahun akademik terpilih dengan benar <a href="{{pathFor route='periodeStudisPage'}}">Master tahun akademik</a></li>
+        <li>Lihat daftar Mata Kuliah <a href="{{pathFor route='matkulPage'}}">Master Mata Kuliah</a></li>
+        <li>Pastikan dosen terdaftar <a href="{{pathFor route='userCenter'}}">Master Pengguna</a></li>
+        <li>Bentuklah Mata Kuliah Aktif <a href="{{pathFor route='matkulPage'}}">Master Mata Kuliah Aktif</a></li>
+        <li>Lihat daftar Ujian <a href="{{pathFor route='ujiansList'}}">Master Ujian</a></li>
+      {{/if}}
+      {{#if isInRole 'dosen' }}
+        <li>Pastikan mata kuliah aktif Anda terdaftar di atas.</li>
+        <li>Hubungi no telp 081 833 8600 bila ada pertanyaan</li>
+      {{/if}}
+      </ol>
+    </div>
+  </section>
+</template>
+
+<template name="mainMenu">
+  <div class="mainMenu">
+    <ul class="main-menu">
+  {{#if isInRole 'dosen' }}
+      <li class="menu-header">Menu Dosen</li>
+      <li><a href="{{ pathFor route='home' }}">Home</a></li>
+      <li><a href="/periodeStudi/{{ currentPsId }}" class="">Daftar Mata Kuliah Aktif</a></li>
+      <li><a href="/taList" class="">Daftar Tugas Akhir</a></li>
+  {{/if}}
+
+  {{#if isInRole 'admin, superadmin' }}
+      <li class="menu-header">Menu Admin</li>
+      <li><a href="{{ pathFor route='home' }}">Home</a></li>
+      <li><a href="/periodeStudi/{{ currentPsId }}" class="">Daftar Mata Kuliah Aktif</a></li>
+      <li><a class="" href="/matkulPage/">Daftar Semua Mata Kuliah</a></li>
+
+      <li class="menu-header">Tugas Akhir</li>
+      <li><a href="/taForm" class="">+ TA</a></li>
+      <li><a href="/taList" class="">Daftar TA</a></li>
+
+      <li class="menu-header">Kurikula</li>
+      <li><a href="/curriculumForm" class="">+ Kurikulum</a></li>
+      <li><a href="/curriculaPage" class="">Daftar Kurikula</a></li>
+
+      <li class="menu-header">Pengguna</li>
+      <li><a href="/createStudent">+ Mahasiswa</a></li>
+      <li><a href="/createDosen">+ Dosen</a></li>
+      <li><a href="{{ pathFor route='userCenter' }}">Config Pengguna</a></li>
+
+      <li class="menu-header">Evaluasi Mata Kuliah</li>
+      <li><a href="/assessment/list">Daftar Lembar Evaluasi</a></li>
+
+      <li class="menu-header">KHS</li>
+      <li><a href="/khs/list">Daftar KHS</a></li>
+      
+      <li class="menu-header">Transcripts</li>
+      <li><a href="/transcripts/list">Daftar Transcripts</a></li>
+
+      <li class="menu-header">Landing Page</li>
+      <li><a href="/documents/create">Dokumen Baru</a></li>
+      <li><a href="/documents/list">Daftar Dokumen</a></li>
+      <li><a href="/lecturers/list">Daftar Profil Dosen</a></li>
+
+      <li class="menu-header">Configs</li>
+      <li><a href="{{ pathFor route='tingkatPage' }}">Config Tingkatan</a></li>
+      <li><a href="{{pathFor route='periodeStudisPage'}}">Config Tahun Akademik</a></li>
+      <li><a href="{{ pathFor route='configPage' }}">Backup/Restore</a></li>
+      
+      <li class="menu-header">Article</li>
+      <li><a href="/listArticle">Article List</a></li>
+      <li><a href="/listOutlet">Outlet List</a></li>
+      <li><a href="/listNews">News List</a></li>
+      <li><a href="/listGeneral">General</a></li>
+      <li><a href="/listPage">Page</a></li>
+      <!-- <li><a href="{{pathFor route='periodeStudisPage'}}">Config Tahun Akademik</a></li>
+      <li><a href="{{ pathFor route='configPage' }}">Backup/Restore</a></li> -->
+  {{/if}}
+      {{> commonMenus}}
+    </ul>
+  </div>
+</template>
+
+<template name="commonMenus">
+  <li class="menu-header">Menu Umum</li>
+  <li><a href="/student/{{ currentUser._id }}">Profil Saya</a></li>
+  <li><a href="/student/{{ currentUser._id }}/edit">Ubah Password</a></li>
+  <li><a href="javascript:;" id="mustLogout" class="logout">Logout</a></li>
+</template>
+
+
+
+<template name="mainMenuSiakad">
+  <div class="mainMenu">
+    <ul class="main-menu">
+      {{#if isInRole 'dosen, admin, superadmin' }}
+      <li><a class="" href="/ujianAkhir"> + Ujian Akhir</a></li>
+      <li><a class="" href="/activeMatkulsPage"> + Ujian Akhir</a></li>
+      {{/if}}
+      {{#if isInRole 'admin, superadmin' }}
+        {{> commonAdminMenus}}
+      {{/if}}
+      {{> commonMenus}}
+    </ul>
+  </div>
+</template>
+
+
+<template name="tingkatPage">
+  <div class="page page-tingkat-page">
+    <h1 class="page-title">Pengaturan Tingkat</h1>
+    {{#if tingkatForm }}
+      {{> quickForm id="tingkatForm" collection=formCollection type="insert" fields="tingkatId, name" }}
+    {{/if}}
+    {{#if isInRole 'admin, superadmin'}}
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <button class="btn btn-primary" id="toggle-tingkat-form">Toggle Form Tingkatan</button>
+      </div>
+    </section>
+    {{/if}}
+    <section class="section-tingkat-list">
+      <h2 class="section-title">Daftar Tingkatan</h2>
+      <ul class="list-group">
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col-sm-6">
+              Tingkat
+            </div>
+<!--             <div class="col-sm-6">
+              Template
+            </div> -->
+          </div>
+        </li>
+        {{#each tingkat}}
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col-sm-6">
+              <a href="/tingkat/{{ _id }}/edit">{{ tingkatId }} - {{name}}</a>
+            </div>
+            <div class="col-sm-6">
+              <!-- <a href="/scoringTemplate/{{ templateId }}/edit"><span class="name">{{ templateName }}</span></a> -->
+            </div>
+          </div>
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+  </div>
+</template>
+
+<template name="tingkatEdit">
+  <div class="page page-tingkat-edit">
+    <h1 class="page-title">{{ tingkatId }} - {{ name }}</h1>
+    <div class="tingkat-edit-form">
+      {{> quickForm id="tingkatForm" collection=formCollection type="update" doc=this fields="tingkatId, name" }}
+      <button class="btn btn-danger" id="delete-tingkat"><i class="fa fa-trash"></i> Delete Tingkat</button>
+    </div>
+  </div>
+</template>
+
+
+<template name="userCenter">
+  <div class="page page-user-center">
+    <div class="page-header"><h1>Daftar Users</h1></div>
+    <div class="alert alert-primary alert-dismissible show text-right" role="alert">
+      <strong>Hello!</strong> Silahkan pilih grup pengguna yg dari kontrol sebelah kanan (dibawah) ini.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <section class="section-page-shoulders">
+      <!-- <div class="btn-group" role="group" aria-label="command control">
+        <button class="btn btn-primary" id="showstudentsList">Daftar Mahasiswa</button>
+        <button class="btn btn-primary" id="showdosensList">Daftar Dosen</button>
+        <button class="btn btn-primary" id="showadminsList">Daftar Admin</button>
+        <button class="btn btn-primary" id="showsuperadminsList">Daftar Superadmin</button>
+      </div> -->
+      <select name="selectDisplay" id="selectDisplay">
+{{#if isInRole 'dosen, admin, superadmin' }}
+        <option value="1">Daftar Mahasiswa</option>
+        <option value="2">Daftar Dosen</option>
+{{/if}}
+{{#if isInRole 'admin, superadmin' }}
+        <option value="3">Daftar Admin</option>
+        <option value="4">Daftar Superadmin</option>
+        <option value="5">Daftar Semua Users</option>
+{{/if}}
+      </select>
+      <div class="btn-group" role="group" aria-label="command control">
+        <button class="btn btn-primary" id="toggleSearch"><i class="fa fa-search"></i>Search</button>
+      </div>
+    </section>
+    {{#if searchOn }}
+    <section class="section-search-user">
+      {{> searchStudents}}
+    </section>
+    {{/if}}
+
+{{#if equals nowListing 1  }}
+  {{> studentsList}}
+{{/if}}
+
+{{#if equals nowListing 2  }}
+  {{> dosensList}}
+{{/if}}
+
+{{#if equals nowListing 3  }}
+  {{> adminsList}}
+{{/if}}
+
+{{#if equals nowListing 4  }}
+  {{> superadminsList}}
+{{/if}}
+
+{{#if equals nowListing 5  }}
+  {{> usersList}}
+{{/if}}
+
+  </div>
+
+</template>
+
+
+
+
+<template name="configUserRoles">
+  <!-- <div class="user-controls btn-group" role="group">
+    <button class="set-formator btn btn-success" id="set-formator">Set As Formator</button>
+    <button type="button" class="btn btn-warning removeAsFormator" id="removeAsFormator">Unset As Formator</button>
+  </div> -->
+  <div class="user-controls btn-group" role="group">
+    {{#if isUserInRole _id 'student'}}
+    <button type="button" class="btn btn-warning removeAsMahasiswa" id="removeAsMahasiswa">Unset As Mahasiswa</button>
+    {{else}}
+    <button type="button" class="setMahasiswa btn btn-success" id="setMahasiswa">Set As Mahasiswa</button>
+    {{/if}}
+  </div>
+  <div class="user-controls btn-group" role="group">
+    {{#if isUserInRole _id 'admin'}}
+    <button type="button" class="btn btn-warning removeAsAdmin" id="removeAsAdmin">Unset As Admin</button>
+    {{else}}
+    <button type="button" class="set-admin btn btn-success" id="set-admin">Set As Admin</button>
+    {{/if}}
+  </div>
+  <div class="user-controls btn-group" role="group">
+    {{#if isUserInRole _id 'superadmin'}}
+    <button type="button" class="btn btn-warning unset-superadmin" id="unset-superadmin">Unset As SuperAdmin</button>
+    {{else}}
+    <button type="button" class="set-superadmin btn btn-success" id="set-superadmin">Set As SuperAdmin</button>
+    {{/if}}
+  </div>
+  <!-- <div class="user-controls btn-group" role="group">
+    <button type="button" class="set-library-station btn btn-success" id="set-library-station">Set As LibraryStation</button>
+    <button type="button" class="btn btn-warning unset-library-station" id="unset-library-station">Unset As LibraryStation</button>
+  </div>
+  <div class="user-controls btn-group" role="group">
+    <button type="button" class="set-librarian btn btn-success" id="set-librarian">Set As Librarian</button>
+    <button type="button" class="btn btn-warning unset-librarian" id="unset-librarian">Unset As Librarian</button>
+  </div> -->
+  <div class="user-controls btn-group" role="group">
+    {{#if isUserInRole _id 'dosen'}}
+    <button type="button" class="btn btn-warning unset-dosen" id="unset-dosen">Unset As Dosen</button>
+    {{else}}
+    <button type="button" class="set-dosen btn btn-success" id="set-dosen">Set As Dosen</button>
+    {{/if}}
+
+  </div>
+  <div class="user-controls btn-group" role="group">
+    {{#if isUserInRole _id 'rektor'}}
+    <button type="button" class="btn btn-warning unset-rektor" id="unset-rektor">Unset As Rektor</button>
+    {{else}}
+    <button type="button" class="set-rektor btn btn-success" id="set-rektor">Set As Rektor</button>
+    {{/if}}
+
+  </div>
+</template>
+
+<!-- <template name="configPage">
+  <div class="page page-config-page">
+    <section class="section-app-dump">
+      <h2 class="section-title">Backup/Restore</h2>
+      {{> appDumpUI}}
+    </section>
+  </div>
+</template> -->
+
+
+<template name="notAuthorized">
+  <h1>Forbidden!</h1>
+</template>
+
+
+
+<template name="periodeStudiDetails">
+  <div class="page page-periode-studi-details">
+    <h1 class="page-title">tahun akademik {{ name }}</h1>
+    {{#if isInRole 'admin, superadmin'}}
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <button class="btn btn-primary" id="stop-periode">Stop tahun akademik</button>
+        <button class="btn btn-primary" id="start-periode">Start tahun akademik</button>
+      </div>
+    </section>
+    {{/if}}
+  </div>
+</template>
+
+
+<template name="kopSurat">
+  <section class="section-kop-surat">
+    <div class="d-flex kop-surat p-2 align-items-center">
+      <div class="logo"><img src="/assets/logo-tok.svg" alt="Imavi"></div>
+      <div class="kop-text">
+        <h2>Institutum Theologicum Ioannis Mariae Vianney</h2>
+        <h6>Seminari Tinggi Providentia Dei Surabaya - Indonesia</h6>
+        <p>Jl. Kalisari Selatan No. 9, Pakuwon City, Surabaya, Indonesia 60112</p>
+      </div>
+    </div>
+  </section>
+</template>
+
+
+
+<template name="nowLoading">
+  <div class="d-flex align-items-center text-center now-loading">
+    <div class="loading-icon">
+    </div>
+  </div>
+</template>

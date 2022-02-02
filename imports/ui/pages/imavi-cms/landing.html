@@ -1,0 +1,285 @@
+<template name="documentCreate">
+  {{#if isInRole 'cmsDocumentCreate' }}
+    <div class="page page-matkul-page">
+      <h1 class="page-title">Dokumen Baru</h1>
+      {{> documentForm submitType=1}}
+    </div>
+  {{else }}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="documentForm">
+  <div class="form-group">
+    <label for="">Judul Dokumen</label>
+    <input type="text" id="title" name="title" placeholder="Judul dari dokumen" class="form-control">
+  </div>
+  <div class="form-group">
+    <label for="" class="text-left">Slug</label>
+    <input type="text" id="slug" class="form-control">
+  </div>
+  <div class="form-group">
+    <label for="" class="text-left">Outlet</label>
+    {{#each outlets}}
+        <div class="form-check">
+            <input type="checkbox" name="" class="form-check-input outlet"
+                style="margin-left: -1.25rem; margin-top: 0.3rem;" id="outlet-{{code}}" value="{{code}}">
+            <label for="outlet-{{code}}" class="form-check-label">{{name}} - {{code}}</label>
+        </div>
+    {{/each}}
+  </div>
+  <div class="form-group">
+    <label for="inputDescription">Konten</label>
+    <!-- The toolbar will be rendered in this container. -->
+    <div id="toolbar-container"></div>
+
+    <!-- This container will become the editable. -->
+    <div id="editor" class="ckeditor-content">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="inputDescription">Gambar Dokumen</label>
+      <div class="uploading">
+        {{#with currentUpload}}
+            <p>Mengunggah <b>{{file.name}}</b>:</p>
+            <span id="progress">{{progress.get}}%</span>
+        {{else}}
+            <div>
+                <input class="hidden" id="uploadImage" type="file"/>
+                <label class="btn btn-primary btn-lg" for="uploadImage">Unggah</label>
+            </div>
+        {{/with}}
+      </div>
+
+      {{#if imageFile }}
+          <div class="d-flex flex-wrap">
+            {{#with thisFile }}
+                <div class="uploaded-image m-2">
+                    {{#if isImage }}
+                        <a href="{{ link }}" class="fancybox image" data-fancybox="chronicle-files">
+                            <img src="{{ link }}" alt="{{ name }}" class="thumbnail">
+                        </a>
+                    {{else}}
+                      <a href="{{ link }}" class="btn btn-primary btn-lg" target="_blank" rel="noreferrer">
+                        <i class="fa fa-file"></i>
+                        <p>{{ name }}</p>
+                      </a>
+                    {{/if}}
+                    <!-- pakai X, karena jika pakai icon dan meski sudah dikasih aria, malah iconnya yang kebaca eventnya -->
+                    <button class="btn btn-danger remove-image"
+                            buttonData="{{_id}}">
+                      X
+                    </button>
+                </div>
+            {{/with}}
+          </div>
+      {{/if}}
+  </div>
+  <div class="form-group">
+    <label for="inputDescription">File Dokumen</label>
+      <div class="uploading">
+        {{#with currentUpload2}}
+            <p>Mengunggah <b>{{file.name}}</b>:</p>
+            <span id="progress">{{progress.get}}%</span>
+        {{else}}
+            <div>
+                <input class="hidden" id="uploadFile" type="file"/>
+                <label class="btn btn-primary btn-lg" for="uploadFile">Unggah</label>
+            </div>
+        {{/with}}
+      </div>
+
+      {{#if docFile }}
+          <div class="d-flex flex-wrap">
+            {{#with thisDocFile }}
+                <div class="uploaded-image m-2">
+                    {{#if isImage }}
+                        <a href="{{ link }}" class="fancybox image" data-fancybox="chronicle-files">
+                            <img src="{{ link }}" alt="{{ name }}" class="thumbnail">
+                        </a>
+                    {{else}}
+                      <a href="{{ link }}" class="btn btn-primary btn-lg" target="_blank" rel="noreferrer">
+                        <i class="fa fa-file"></i>
+                        <p>{{ name }}</p>
+                      </a>
+                    {{/if}}
+                    <!-- pakai X, karena jika pakai icon dan meski sudah dikasih aria, malah iconnya yang kebaca eventnya -->
+                    <button class="btn btn-danger remove-file"
+                            buttonData="{{_id}}">
+                      X
+                    </button>
+                </div>
+            {{/with}}
+          </div>
+      {{/if}}
+  </div>
+  <div class="form-actions text-center">
+    <button class="btn btn-primary btn-block" id="submit-form">Simpan</button>
+  </div>
+</template>
+
+<template name="documentList">
+  {{#if isInRole 'cmsDocumentList' }}
+    <div class="page page-students-list">
+      <section class="section-students-list">
+        <h2 class="section-title">Daftar Dokumen</h2>
+        <section class="section-page-shoulders">
+          <div class="btn-group" role="group" aria-label="command control">
+            {{#if isInRole 'cmsDocumentCreate'}}
+            <a href="{{ pathFor route='documentCreate' }}" class="btn btn-primary"><i class="fa fa-plus"></i>Dokumen Baru</a>
+            {{/if}}
+          </div>
+        </section>
+        <div class="tingkats-list">
+          <ul class="students-list list-group">
+            {{#each dataList}}
+              {{> documentItem}}
+            {{/each}}
+          </ul>
+        </div>
+      </section>
+    </div>
+  {{else }}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="documentItem">
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div class="flex-grow-1">
+      <div class="name">{{title}}</div>
+      <p>{{createdAt}}</p>
+    </div>
+    <div class="flex-shrink">
+      {{#if isInRole 'cmsDocumentEdit'}}
+      <a href="{{ pathFor route='documentEdit' _id=_id }}" class="btn btn-warning">Ubah</a>
+      {{/if}}
+
+      {{#if isInRole 'cmsDocumentDelete'}}
+      <button class="btn btn-danger delete-document">Hapus</button>
+      {{/if}}
+    </div>
+  </li>
+</template>
+
+<template name="documentEdit">
+  {{#if isInRole 'cmsDocumentEdit' }}
+    <div class="page page-matkul-page">
+      <h1 class="page-title">Edit Dokumen</h1>
+      {{> documentForm submitType=2}}
+    </div>
+  {{else }}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="lecturerList">
+  {{#if isInRole 'cmsLecturerProfile' }}
+    <div class="page page-students-list">
+      <section class="section-students-list">
+        <h2 class="section-title">Daftar Profil Dosen</h2>
+        <div class="tingkats-list">
+          <ul class="students-list list-group">
+            {{#each dataList}}
+              {{> lecturerItem}}
+            {{/each}}
+          </ul>
+        </div>
+      </section>
+    </div>
+  {{else }}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="lecturerItem">
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div class="flex-grow-1">
+      <div class="name">{{fullname}}</div>
+    </div>
+    <div class="flex-shrink">
+      <a href="{{ pathFor route='lecturerEdit' _id=_id }}" class="btn btn-warning">Ubah</a>
+      <a class="btn btn-primary toggle-featured">
+        <i aria-hidden="true" class="fa fa-star {{#if featured}}text-orange{{else}}text-white{{/if}}" status="{{featured}}" milik="{{_id}}" value="{{featured}}">
+        </i>
+      </a>
+    </div>
+  </li>
+</template>
+
+<template name="lecturerEdit">
+  {{#if isInRole 'cmsLecturerProfile' }}
+    <div class="page page-matkul-page">
+      <h1 class="page-title">Edit Profil Dosen</h1>
+      <h2 class="page-title">untuk landing page</h2>
+      {{> lecturerForm submitType=2}}
+    </div>
+  {{else }}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="lecturerForm">
+  <div class="form-group">
+    <label for="">Nama Dosen</label>
+    <input type="text" id="fullname" name="fullname" placeholder="Nama lengkap dosen" class="form-control">
+  </div>
+  <div class="form-group">
+    <label for="" class="text-left">Slug</label>
+    <input type="text" id="slug" class="form-control">
+  </div>
+  <div class="form-group">
+    <label for="">Keterangan Card</label>
+    <input type="text" id="keterangan" name="keterangan" placeholder="Deskripsi singkat untuk card dosen" class="form-control">
+  </div>
+  <div class="form-group">
+    <label for="inputDescription">Deskripsi</label>
+    <!-- The toolbar will be rendered in this container. -->
+    <div id="toolbar-container"></div>
+
+    <!-- This container will become the editable. -->
+    <div id="editor" class="ckeditor-content">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="inputDescription">Foto Dosen</label>
+      <div class="uploading">
+        {{#with currentUpload}}
+            <p>Mengunggah <b>{{file.name}}</b>:</p>
+            <span id="progress">{{progress.get}}%</span>
+        {{else}}
+            <div>
+                <input class="hidden" id="uploadImage" type="file"/>
+                <label class="btn btn-primary btn-lg" for="uploadImage">Unggah</label>
+            </div>
+        {{/with}}
+      </div>
+
+      {{#if imageFile }}
+          <div class="d-flex flex-wrap">
+            {{#with thisFile }}
+                <div class="uploaded-image m-2">
+                    {{#if isImage }}
+                        <a href="{{ link }}" class="fancybox image" data-fancybox="chronicle-files">
+                            <img src="{{ link }}" alt="{{ name }}" class="thumbnail">
+                        </a>
+                    {{else}}
+                      <a href="{{ link }}" class="btn btn-primary btn-lg" target="_blank" rel="noreferrer">
+                        <i class="fa fa-file"></i>
+                        <p>{{ name }}</p>
+                      </a>
+                    {{/if}}
+                    <!-- pakai X, karena jika pakai icon dan meski sudah dikasih aria, malah iconnya yang kebaca eventnya -->
+                    <button class="btn btn-danger remove-image"
+                            buttonData="{{_id}}">
+                      X
+                    </button>
+                </div>
+            {{/with}}
+          </div>
+      {{/if}}
+  </div>
+  <div class="form-actions text-center">
+    <button class="btn btn-primary btn-block" id="submit-form">Simpan</button>
+  </div>
+</template>

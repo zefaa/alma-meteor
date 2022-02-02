@@ -1,0 +1,541 @@
+<template name="coursesForm">
+    <div class="form-group">
+      <label for="">Nama Kursus</label>
+      <input type="text" id="input-name" name="input-name" placeholder="Nama Kursus" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="" class="text-left">Slug</label>
+      <input type="text" id="slug" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="">Keterangan Card</label>
+      <input type="text" id="input-excerpt" name="input-excerpt" placeholder="Deskripsi singkat untuk card kursus" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="inputDescription">Deskripsi</label>
+      <!-- The toolbar will be rendered in this container. -->
+      <div id="toolbar-container"></div>
+
+      <!-- This container will become the editable. -->
+      <div id="editor" class="ckeditor-content">
+      </div>
+    </div>
+    <div class="form-group">
+        <label for="">Link Registrasi</label>
+        <input type="text" id="input-registrasiLink" name="input-registrasiLink" placeholder="Link registrasi untuk kursus ini" class="form-control">
+      </div>
+    <div class="form-actions text-center">
+      <button class="btn btn-primary btn-block" id="submit-form">Simpan</button>
+    </div>
+</template>
+
+<template name="acpCertificateCreate">
+  {{#if isInRole 'cimCoursesEdit' }}
+    <div class="page page-matkul-page">
+      <h1 class="page-title">Buat Sertifikat</h1>
+    </div>
+    
+    <div class="form-group">
+      <label for="">Nomor Sertifikat</label>
+      <input type="text" id="input-certificatenum" name="input-certificatenum"  class="form-control" disabled>
+    </div>
+    
+    <div class="form-group">
+      <label for="">Penerima</label>
+      <ul class="list-group">
+        {{#each pushedLecturers }}
+        <li class="list-group-item align-items-center">     
+            <span class="name">{{ fullName }}</span> <br>
+            <span class="email" style="font-size:smaller;">{{email}}</span>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+
+    <div class="form-group">
+      <label for="">Nama ACP</label>
+      <input type="text" id="input-acpname" name="input-acpname"  class="form-control" disabled>
+    </div>
+    <div class="form-group">
+      <label for="">Materi Kursus</label>
+      <input type="text" id="input-materials" placeholder= "Materi Kursus" name="input-materials"  class="form-control">
+    </div>
+    <div class="form-actions text-center">
+      <button class="btn btn-primary btn-block" id="submit-form">Simpan</button>
+    </div>
+  {{else }}
+      {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="coursesList">
+
+  {{#if isInRole 'cimCoursesList'}}
+    <div class="page page-curricula-page">
+      <h1 class="page-title">Daftar Kursus</h1>
+
+      <section class="section-page-shoulders">
+        <div class="btn-group" role="group" aria-label="command control">
+          {{#if isInRole 'cimCoursesCreate'}}
+            <a href="{{ pathFor route='coursesCreate' _id=(toMeteorId _id) }}" class="btn btn-primary">+ Program Kursus Baru</a>
+          {{/if}}
+          </div>
+      </section>
+
+      {{#if showCurriculumForm }}
+        {{> curriculumForm}}
+      {{else}}
+
+      <div class="page page-curriculum-list">
+        <table class="table">
+            <thead>
+              <tr>
+                <th>Nama Kursus</th>
+                <th>Slug</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            {{#each courses}}
+            <tr>
+              <td>{{ name }}</td>
+              <td>{{ slug }}</td>
+              <td>
+                {{#if isInRole 'cimCoursesEdit'}}
+                  <a href="{{ pathFor route='coursesEdit' _id=(toMeteorId _id) }}" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
+                  <!-- <a href="/cim/{{toMeteorId _id }}" class="btn btn-primary"><i class="fa fa-eye"></i></a> -->
+                {{/if}}
+                </td>
+            </tr>
+            {{/each}}
+          </table>
+        <ul class="unstyled">
+          {{#each curriculum}}
+          <li class="">
+            <a href="{{ pathFor route='curriculaEdit' _id=(_id) }}">
+            <!-- <a href="/cim/curricula/{{ _id }}/edit"> -->
+              <div class="card">
+                <div class="card-header name">{{ name }}</div>
+                <div class="card-body description">{{description}}</div>
+              </div>
+            </a>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+
+      {{/if}}
+    </div>
+  {{ else }}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="coursesCreate">
+    {{#if isInRole 'cimCoursesCreate' }}
+      <div class="page page-matkul-page">
+        <h1 class="page-title">Program Kursus Baru</h1>
+        {{> coursesForm submitType=1}}
+      </div>
+    {{else }}
+      {{> notAuthorized}}
+    {{/if}}
+</template>
+
+<template name="coursesEdit">
+    {{#if isInRole 'cimCoursesEdit' }}
+      <div class="page page-matkul-page">
+        <h1 class="page-title">Program Kursus Edit</h1>
+        {{> coursesForm submitType=2}}
+      </div>
+    {{else }}
+      {{> notAuthorized}}
+    {{/if}}
+</template>
+
+<template name="activeCoursesList">
+  {{#if isInRole 'cimAcpList'}}
+  <section class="section-matkuls-list">
+    <h2 class="section-title">Daftar Kursus Aktif</h2>
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        {{#if isInRole 'cimAcpCreate'}}
+          <a href="{{ pathFor route = 'activeCoursesCreate' }}" class="btn btn-primary">+ Program Kursus Aktif Baru</a>
+        {{/if}}
+        </div>
+    </section>
+    <ul class="students-list list-group">
+      {{#each activeCourses}}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div class="d-flex flex-column">
+          <div class="flex-grow-1">
+            <div class="name text-primary">
+              {{curriculaName}} - {{name}}
+            </div>
+          </div>
+          <div class="flex-grow-1">
+            <span>{{excerpt}}</span>
+          </div>
+        </div>
+
+        <div class="flex-shrink">
+          {{#if isInRole 'cimAcpEdit'}}
+            <a href="{{ pathFor route = 'activeCoursesEdit' _id=(toMeteorId _id) }}" class="btn btn-primary">Ubah</a>
+            <a href="{{ pathFor route = 'acpMaterialList' _id=(toMeteorId _id) _acpId=(toMeteorId _id) }}" class="btn btn-primary text-white">Materi</a>
+            <a href="{{ pathFor route = 'acpUjianList' _id=(toMeteorId _id) _acpId=(toMeteorId _id) }}" class="btn btn-primary text-white">Ujian</a>
+            <a href="{{ pathFor route = 'acpParticipantList' _id=(toMeteorId _id) _acpId=(toMeteorId _id) }}" class="btn btn-primary text-white">Peserta</a>
+            <a href="{{ pathFor route = 'acpCertificateCreate' _id=(toMeteorId _id) _acpId=(toMeteorId _id) }}" class="btn btn-primary text-white">Sertifikat</a>
+          {{/if}}
+        </div>
+      </li>
+      {{/each}}
+    </ul>
+  </section>
+  {{ else }}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="activeCoursesForm">
+  <div class="form-group">
+    {{#if equals submitKey 1}}
+    <label for="">Pilih Kursus</label>
+    <select name="select-course" id="select-course" class="select2 form-control select-evaluator">
+      <option value="0">-- Pilih Nama Kursus --</option>
+      {{#each courses }}
+     <option value="{{toMeteorId _id }}">{{name}}</option>
+     {{/each}}
+    </select>
+    {{/if}}
+  </div>
+
+  <div class="form-group">
+    <label for="">Nama Kursus</label>
+    <input type="text" id="input-name" name="input-name" placeholder="Nama Kursus" class="form-control">
+  </div>
+  <div class="form-group">
+    <label for="">Deskripsi singkat</label>
+    <input type="text" id="input-excerpt" name="input-excerpt" placeholder="Deskripsi singkat" class="form-control">
+  </div>
+
+  <div class="form-group">
+    <label for="inputSchedule">Deskripsi</label>
+    <!-- The toolbar will be rendered in this container. -->
+    <div id="toolbar-container2"></div>
+
+    <!-- This container will become the editable. -->
+    <div id="editor2" class="ckeditor-content">
+    </div>
+  </div>
+
+  <div class="form-group">
+
+    <label for="">Pilih Kurikulum</label>
+    <select name="select-curricula" id="select-curricula" class="select2 form-control select-evaluator">
+      <option value="0">-- Pilih Nama Kurikulum --</option>
+      {{#each curriculas }}
+     <option value="{{ _id }}">{{name}}</option>
+     {{/each}}
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="">Pengajar</label>
+
+    <select name="select-lecturers" id="select-lecturers" class="form-control select2">
+      <option value="">== Pilih Pengajar ==</option>
+      {{#each lecturers}}
+      <option value="{{toMeteorId _id }}">{{ fullName }}</option>
+      {{/each}}
+    </select>
+    <ul class="list-group">
+      {{#each pushedLecturers }}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="{{ pathFor route='matkulDetails' _id = (toMeteorId _id) }}">
+          <span class="name">{{ fullName }}</span>
+        </a>
+        <div><button class="btn btn-danger delete-lecturer"><i class="fa fa-trash"></i></button></div>
+      </li>
+      {{/each}}
+    </ul>
+
+  </div>
+
+
+  <div class="form-group">
+    <label for="inputSchedule">Jadwal</label>
+    <!-- The toolbar will be rendered in this container. -->
+    <div id="toolbar-container"></div>
+
+    <!-- This container will become the editable. -->
+    <div id="editor" class="ckeditor-content">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="">Nomor Sertifikat</label>
+    <input type="text" id="certificate" name="certificate" placeholder="Nomor sertifikat untuk cetak pdf" class="form-control">
+  </div>
+
+  <div class="form-group">
+    <label for="">Tanggal Kursus Berakhir</label>
+    <input type="date" id="finalDate" name="finalDate" class="form-control">
+  </div>
+
+
+  <div class="form-actions text-center">
+    <button class="btn btn-primary btn-block" id="submit-form">Simpan</button>
+  </div>
+</template>
+
+<template name="activeCoursesCreate">
+  {{#if isInRole 'cimAcpCreate' }}
+    <div class="page page-matkul-page">
+      <h1 class="page-title">Program Kursus Aktif Baru</h1>
+      {{> activeCoursesForm submitType=1}}
+    </div>
+  {{else }}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="activeCoursesEdit">
+  {{#if isInRole 'cimAcpEdit' }}
+    <div class="page page-matkul-page">
+      <h1 class="page-title">Program Kursus Aktif Baru</h1>
+      {{> activeCoursesForm submitType=2}}
+    </div>
+  {{else }}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="acpMaterialList">
+  {{#if isInRole 'cimAcpEdit'}}
+  <section class="section-matkuls-list">
+    <h2 class="section-title">Daftar Materi Program Kursus Aktif</h2>
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+          <a href="{{ pathFor route='acpMaterialCreate' _acpId=(toMeteorId currentAcp._id) }}" class="btn btn-primary">+ Materi Baru</a>
+        </div>
+    </section>
+    <ul class="students-list list-group">
+      {{#each currentAcp.materials}}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div class="d-flex flex-column">
+          <div class="flex-grow-1">
+            <div class="name text-primary">
+              {{name}}
+            </div>
+          </div>
+        </div>
+        <div class="flex-shrink">
+          <a href="{{ pathFor route='acpMaterialEdit' _acpId=(toMeteorId currentAcp._id) _id=_id }}" class="btn btn-primary">Ubah</a>
+          <!-- <button class="btn btn-danger">Hapus</button> -->
+        </div>
+      </li>
+      {{/each}}
+    </ul>
+  </section>
+  {{else}}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="acpMaterialForm">
+  <div class="form-group">
+    <label for="">Nama Materi</label>
+    <input type="text" id="input-name" name="input-name" placeholder="Nama Materi" class="form-control">
+  </div>
+
+  <div class="form-group">
+    <label for="" class="text-left">Deskripsi</label>
+    <!-- The toolbar will be rendered in this container. -->
+    <div id="toolbar-container"></div>
+
+    <!-- This container will become the editable. -->
+    <div id="editor" class="ckeditor-content"></div>
+  </div>
+
+  <div class="form-group">
+    <label for="inputDescription">File Dokumen</label>
+      <div class="uploading">
+        {{#with currentUpload2}}
+            <p>Mengunggah <b>{{file.name}}</b>:</p>
+            <span id="progress">{{progress.get}}%</span>
+        {{else}}
+            <div>
+                <input class="hidden" id="uploadFile" type="file"/>
+                <label class="btn btn-primary btn-lg" for="uploadFile">Unggah</label>
+            </div>
+        {{/with}}
+      </div>
+
+      {{#if docFile }}
+          <div class="d-flex flex-wrap">
+            {{#with thisDocFile }}
+                <div class="uploaded-image m-2">
+                    {{#if isImage }}
+                        <a href="{{ link }}" class="fancybox image" data-fancybox="chronicle-files">
+                            <img src="{{ link }}" alt="{{ name }}" class="thumbnail">
+                        </a>
+                    {{else}}
+                      <a href="{{ link }}" class="btn btn-primary btn-lg" target="_blank" rel="noreferrer">
+                        <i class="fa fa-file"></i>
+                        <p>{{ name }}</p>
+                      </a>
+                    {{/if}}
+                    <!-- pakai X, karena jika pakai icon dan meski sudah dikasih aria, malah iconnya yang kebaca eventnya -->
+                    <button class="btn btn-danger remove-file"
+                            buttonData="{{_id}}">
+                      X
+                    </button>
+                </div>
+            {{/with}}
+          </div>
+      {{/if}}
+  </div>
+
+  <div class="form-group">
+    <label for="inputDescription">Gambar Dokumen</label>
+      <div class="uploading">
+        {{#with currentUpload}}
+            <p>Mengunggah <b>{{file.name}}</b>:</p>
+            <span id="progress">{{progress.get}}%</span>
+        {{else}}
+            <div>
+                <input class="hidden" id="uploadImage" type="file"/>
+                <label class="btn btn-primary btn-lg" for="uploadImage">Unggah</label>
+            </div>
+        {{/with}}
+      </div>
+
+      {{#if imageFile }}
+          <div class="d-flex flex-wrap">
+            {{#with thisFile }}
+                <div class="uploaded-image m-2">
+                    {{#if isImage }}
+                        <a href="{{ link }}" class="fancybox image" data-fancybox="chronicle-files">
+                            <img src="{{ link }}" alt="{{ name }}" class="thumbnail">
+                        </a>
+                    {{else}}
+                      <a href="{{ link }}" class="btn btn-primary btn-lg" target="_blank" rel="noreferrer">
+                        <i class="fa fa-file"></i>
+                        <p>{{ name }}</p>
+                      </a>
+                    {{/if}}
+                    <!-- pakai X, karena jika pakai icon dan meski sudah dikasih aria, malah iconnya yang kebaca eventnya -->
+                    <button class="btn btn-danger remove-image"
+                            buttonData="{{_id}}">
+                      X
+                    </button>
+                </div>
+            {{/with}}
+          </div>
+      {{/if}}
+  </div>
+
+  <div class="form-actions text-center">
+    <button class="btn btn-primary btn-block" id="submit-form">Simpan</button>
+  </div>
+</template>
+
+<template name="acpMaterialCreate">
+  {{#if isInRole 'cimAcpEdit' }}
+  <div class="page page-matkul-page">
+    <h1 class="page-title">Materi Baru <br> {{ name }}</h1>
+    {{> acpMaterialForm submitType=1}}
+  </div>
+{{else }}
+  {{> notAuthorized}}
+{{/if}}
+</template>
+
+<template name="acpMaterialEdit">
+  {{#if isInRole 'cimAcpEdit' }}
+  <div class="page page-matkul-page">
+    <h1 class="page-title">Materi Edit <br> {{name}}</h1>
+    {{> acpMaterialForm submitType=2}}
+  </div>
+{{else }}
+  {{> notAuthorized}}
+{{/if}}
+</template>
+
+<template name="acpParticipantList">
+  {{#if isInRole 'cimAcpEdit'}}
+    <section class="section-matkuls-list">
+      <div class="{{#if equals createMode false}}d-none{{/if}}">
+        <h2 class="section-title">Tambah Peserta Kursus</h2>
+        <div class="form-group">
+          <label>Daftar Peserta CIM</label>
+          <select name="new-participants" id="new-participants" class="select2 form-control" multiple>
+            {{#each students}}
+              <option value="{{profileId}}"> {{ fullName }} </option>
+            {{/each}}
+          </select>
+        </div>
+
+        <section class="section-page-shoulders">
+          <div class="btn-group" role="group" aria-label="command control">
+            <button class="btn btn-primary" id="submit-participants">
+              Daftarkan
+            </button>
+          </div>
+        </section>
+      </div>
+      <h2 class="section-title">Daftar Peserta Kursus Aktif</h2>
+      <h3 class="section-title">{{dataDetail.name}}</h3>
+      <section class="section-page-shoulders">
+        <div class="btn-group" role="group" aria-label="command control">
+          <!-- <button class="btn btn-danger">Mode Hapus</button> -->
+          <button id="toggle-score" class="btn btn-primary mr-3">
+            {{#if scoreMode}}
+              Lihat Nilai Akhir
+            {{else}}
+              Beri Nilai Akhir
+            {{/if}}
+          </button>
+          <button id="toggle-create" class="btn btn-primary mr-3">
+            {{#if createMode}}
+              Tutup Peserta Baru
+            {{else}}
+              Buka Peserta Baru
+            {{/if}}
+          </button>
+          <!-- tidak jadi karena masih perlu subscribe di cimParticipantCreate -->
+          <!-- {{ #if isInRole 'cimParticipantCreate'}}
+            <a href="{{ pathFor route='participantsCreate' }}" class="btn btn-primary">+ User External Baru</a>
+          {{ /if }} -->
+        </div>
+      </section>
+      <ul class="students-list list-group mt-5">
+        {{#each dataDetail.participantList}}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="d-flex flex-column">
+              <div class="flex-grow-1">
+                <div class="name text-primary">
+                  {{fullName}}
+                </div>
+              </div>
+            </div>
+            <div class="flex-shrink">
+              {{#if scoreMode}}
+                <input type="number" id="score-{{enrollmentId}}" class="form-control" value="{{finalScore}}">
+              {{else}}
+                <span class="text-primary">{{finalScore}}</span>
+              {{/if}}
+              <!-- <button class="btn btn-danger">Hapus</button> -->
+            </div>
+          </li>
+        {{/each}}
+      </ul>
+      {{#if scoreMode}}
+        <button id="save-score" class="btn btn-primary btn-block mt-5">
+          Simpan Nilai Akhir
+        </button>
+      {{/if}}
+    </section>
+  {{else}}
+    {{> notAuthorized}}
+  {{/if}}
+</template>

@@ -1,0 +1,150 @@
+<template name="periodeReport">
+{{#if isInRole 'formator, admin, superadmin' }}
+  <div class="page page-periode-report page-report">
+    <h1 class="page-title">Periode Report</h1>
+    <div class="students-list">
+      {{#each student}}
+      <div class="student-item">
+        <h3 class="block-title">Subject Penilaian: <span class="name">{{ username }}</span></h3>
+        <div class="sheets-list">
+          {{#each scoreSheets }}
+            {{> studentSheetItem}}
+          {{/each }}
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+{{/if}}
+</template>
+
+<template name="studentReport">
+{{#if isInRole 'formator, admin, superadmin' }}
+  <div class="page page-student-report page-report">
+    <h1 class="page-title">Report: {{ username }}</h1>
+    {{#if nowLoading}}
+    <div class="panel panel-lg text-center">
+      <h1>Now Loading</h1>
+    </div>
+    {{ else }}
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <a class="btn btn-primary btn-print" href="/student/{{ _id }}/report/print" target="_blank">Print</a>
+      </div>
+    </section>
+    <section class="section-processed-data">
+      <!-- <h2 class="section-title">Processed Data</h2> -->
+      <div class="processed-data">
+        <ul class="list-group">
+          {{#each groupedCountedItem}}
+          <li class="card">
+            <h3 class="card-header capitalized">{{ title }}</h3>
+            <div class="card-body">
+              <ul class="scoring-item-list unstyled">
+                {{#each items}}
+                <li>
+                  <table class="table table-striped table-bordered counted-data-table">
+                    <thead class="">
+                      <th class="question" colspan="2">  {{ qitemQuestion }}</th>
+                    </thead>
+                    <!-- <div class="value">{{ value }}</div> -->
+                    {{#each countedData}}
+                    <tr class="{{#if self }} isSelf {{/if}}">
+                      <td>{{formatAnswer answer}}</td>
+                      <td>{{ count }}</td>
+                    </tr>
+                    {{/each}}
+                    {{#each scoringItems}}
+                      {{#if isNaN value}}
+                        <tr class="note-fields">
+                          <td colspan="2" class="catatan">
+                            <p>{{formatFormatorPass value }}</p>
+                            <p>{{formatUsername createdBy }}</p>
+                          </td>
+                        </tr>
+                      {{/if}}
+                    {{/each}}
+                </table>
+                </li>
+                {{/each}}
+              </ul>
+            </div>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+    </section>
+    {{/if}}
+  </div>
+{{/if}}
+</template>
+
+<template name="studentReportPrint">
+{{#if isInRole 'formator, admin, superadmin' }}
+  {{>studentReport}}
+{{/if}}
+</template>
+
+
+<template name="studentSheetItem">
+{{#if isInRole 'formator, admin, superadmin' }}
+  <div class="sheet-item scoresheet-item pass-{{ formatorPass }}">
+    <h4 class="creator-name name">Penilai: {{ createdByName }} <span class="label timestamp">{{formatHRDT timestamp }}</span></h4>
+    <div class="group-item-list">
+      {{#each groupItem}}
+      <div class="group-item">
+        <h3 class="block-title title">{{abolishNull title }}</h3>
+        <ul class="list-group">
+          {{#each items }}
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-xs-12 col-md-6 question">{{ qitemQuestion }}</div>
+              <div class="col-xs-12 col-md-6 text-right"><span class="label answer answer{{value}}">{{formatAnswer value}}</span></div>
+            </div>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+    {{/each}}
+    </div>
+    <div class="sheet-summary panel panel-well pass-{{ formatorPass }}">
+      <h5 class="table-title">Sheet Summary</h5>
+      <table class="table-bordered table-striped table">
+        <thead>
+          <th>Assessment</th>
+          <th>Count</th>
+        </thead>
+        {{#each answerItem}}
+        <tr>
+          <td>{{formatAnswer title }}</td>
+          <td>{{ items.length }}</td>
+        </tr>
+        {{/each}}
+        <tr>
+          <td>Rekomendasi Formator</td>
+          <td>{{formatFormatorPass formatorPass }}</td>
+        </tr>
+        <tr>
+          <td>Catatan Formator</td>
+          <td>{{ formatorNote }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+{{/if}}
+</template>
+
+<!-- {{#each formData}}
+<td>
+  <div class="question">{{ qitemQuestion }}</div>
+  <div class="answer"><span class="label answer answer{{value}}">{{formatAnswer value }}</span></div>
+</td>
+{{/each}} -->
+
+<!-- <div class="question">{{ qitemQuestion }}</div>
+<div class="answer"><span class="label answer answer{{value}}">{{formatAnswer value }}</span></div> -->
+
+
+
+
+<!-- view rektor -->

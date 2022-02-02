@@ -1,0 +1,138 @@
+
+<template name="periodeStudisPage">
+  <div class="page page-periode-studi-page">
+    <h1 class="page-title">tahun akademik</h1>
+    {{#if periodeForm }}
+      {{> quickForm id="periodeForm" collection=formCollection type="insert" fields="name, note"}}
+    {{/if}}
+    {{#if isInRole 'admin, superadmin'}}
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <button class="btn btn-primary" id="toggle-periode-form">+ Tahun Akademik</button>
+        <button class="btn btn-primary" id="toggle-periode-switch">Ganti Tahun Akademik</button>
+        <button class="btn btn-primary" id="naikKelasSemua">Naik Tingkat</button>
+        <!-- <button class="btn btn-primary" id="toggle-confirmNaikKelas" data-toggle="modal" data-target="#confirmNaikKelas">Naik Tingkat</button> -->
+      </div>
+    </section>
+    {{/if}}
+    <section class="section-periode-studi-list">
+      <h2 class="section-title">Daftar tahun akademik</h2>
+      <ul class="list-group">
+        {{#each periodeStudi }}
+        <li class="list-group-item ps-item active-{{ status }}">
+          <!-- <a href="/periodeStudi/{{ _id }}"> -->
+            <div class="d-flex justify-content-between align-items-center ">
+              <div class="">
+                <a href="/periodeStudi/{{ _id }}">{{ name }}</a>
+              </div>
+              <div>
+              {{#if status}}
+                <span class="label active">active</span>
+              {{/if}}
+                <button id="delete-ps" class="btn btn-danger"><i class="fa fa-trash"></i></button>
+              </div>
+              <!-- <div class="">{{formatHRDate startDate }}</div> -->
+            </div>
+          <!-- </a> -->
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+    {{#if periodeSwitch }}
+
+    <section class="section-periode-studi-switch">
+      <h2 class="section-title">Ganti tahun akademik</h2>
+      <div class="periode-studi-switch-wrapper form-group">
+        <select name="psSwitch" id="psSwitch" class="select2 form-control">
+          {{#each periodeStudi }}
+          <option value="{{ _id }}">{{ name }}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="form-group form-actions">
+        <button class="btn btn-primary" id="periode-studi-switch">OK</button>
+      </div>
+    </section>
+    {{/if}}
+  </div>
+</template>
+
+<template name="psDetails">
+  <div class="page page-periode-studi-details">
+    <h1 class="page-title">tahun akademik: {{ name }}</h1>
+
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+    {{#if isInRole 'admin, superadmin'}}
+        <button class="btn btn-primary btn-block" id="toggleKHS">Proses KHS</button>
+        <a target="_blank" rel="noreferrer" href="/periodeStudi/{{ _id }}/print" class="btn btn-primary" id="printSchedule"><i class="fa fa-print"></i> Print</a>
+    {{ else }}
+    {{/if}}
+      </div>
+    </section>
+{{#if showKHS }}
+    <section class="section-generate-khs">
+      <h2 class="section-title">Memproses KHS</h2>
+      <div class="panel panel-lg text-center">
+        <h3 class="block-title">PERHATIAN!</h3>
+        <p>Fungsi ini akan menulis (ulang) KHS menggunakan data terakhir!</p>
+        <p>Pastikan Anda yakin!</p>
+      </div>
+      <div class="form-actions form-group">
+        <button class="btn btn-primary btn-block" id="generateKHS">Ya, saya yakin! Semua data KHS dan Transkrip akan ditulis ulang dengan data terakhir!</button>
+      </div>
+    </section>
+{{else}}
+
+    <section class="section-summary">
+      <table class="table table-bordered">
+        <tbody>
+          <tr>
+            <td width="200">Status</td>
+            <td>{{formatPsStatus status }}</td>
+          </tr>
+          <tr>
+            <td width="200">Catatan</td>
+            <td>{{ note }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- {{> jadwalKuliah}} -->
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Mata Kuliah</th>
+          <th>Dosen</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each activeMatkuls }}
+        <tr>
+          <td class="title">{{ name }}</td>
+          <td>{{formatFullname dosenId }}</td>
+          <td><a href="/activeMatkul/{{ _id }}">View</a></td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+{{/if}}
+
+  </div>
+</template>
+
+
+
+
+<template name="psDetailsPrint">
+  <div class="page page-periode-studi-details">
+    {{> kopSurat}}
+    <h1 class="page-title">tahun akademik: {{ name }}</h1>
+  
+    {{> jadwalKuliah}}
+
+  </div>
+</template>

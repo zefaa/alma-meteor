@@ -1,0 +1,84 @@
+<template name="studentKhs">
+{{#if isMahasiswa }}
+  <div class="page page-student-khs">
+    <div class="page-header">
+      <h1 class="page-title">Kartu Hasil Studi</h1>
+      <h3 class="subtitle">{{ fullname }} <br>
+      {{ noPokok }}</h3>
+    </div>
+
+    <!-- each periode studi -->
+    <ul class="list-group">
+    	{{#each khs}}
+    	<li class="list-group-item">
+    		<a class="name" href="/khs/{{ _id }}/details">{{ psName }}</a>
+    	</li>
+    	{{/each}}
+    </ul>
+    <!-- each acmatkul + final score -->
+
+    <!-- cummulative score -->
+  </div>
+  {{/if}}
+</template>
+
+<template name="khsDetails">
+  {{#if isMahasiswa }}
+	<div class="page page-khs-detail">
+		<div class="page-header">
+			<h1 class="page-title">Kartu Hasil Studi</h1>
+			<p class="subtitle">{{ studentName }} <br>{{ noPokok }}</p>
+		</div>
+		<table class="table summary-table">
+			<tbody>
+				<tr>
+					<th>Total SKS</th>
+					<td class="text-right">{{ totalSks }}</td>
+				</tr>
+				<tr>
+					<th>IPS</th>
+					<td class="text-right">{{ gpsf }}</td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="table">
+			<thead>
+				<th>Mata Kuliah</th>
+				<th class="text-center">SKS</th>
+				<th class="text-right">Nilai</th>
+			</thead>
+			<tbody>
+				{{#each amk }}
+				<tr>
+				<td class="name">{{ code }} - {{ mkName }}</td>
+				<td class="text-center">{{ sks }}</td>
+				<td class="text-right">{{ score }}</td>
+				</tr>
+				{{/each}}
+			</tbody>
+		</table>
+	</div>
+	{{/if}}
+</template>
+
+<template name="khsList">
+  {{#if isInRole 'admin, superadmin' }}
+	<div class="page page-khs-list">
+		<h1 class="page-title">Daftar Semua KHS</h1>
+		<table class="table">
+			<thead>
+				<th>Nama</th>
+				<th>Tahun Akademik</th>
+			</thead>
+			<tbody>
+				{{#each khs}}
+				<tr>
+					<td><a class="name" href="/khs/{{ _id }}/details">{{ noPokok }} - {{ studentName }}</a></td>
+					<td><a class="name" href="/khs/{{ _id }}/details">{{ psName }}</a></td>
+				</tr>
+				{{/each}}
+			</tbody>
+		</table>
+	</div>
+	{{/if}}
+</template>

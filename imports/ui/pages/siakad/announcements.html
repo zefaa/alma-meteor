@@ -1,0 +1,154 @@
+
+<template name="announcementForm">
+  <div class="page page-announcement-form">
+    <h1 class="page-title">+ Pengumuman Baru</h1>
+    {{> activeMatkulSummary}}
+    <form action="" id="acmatkulAnnForm">
+      <div class="form-group">
+        <label for="inputTitle">Judul</label>
+        <input type="text" id="inputTitle" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="inputDescription">Deskripsi</label>
+        <textarea name="inputDescription" id="inputDescription" cols="30" rows="3" class="summernote form-control"></textarea>
+      </div>
+      <div class="d-flex justify-content-center align-content-center">
+        <div class="form-group p-2"><label for="dateStart">Tanggal Mulai</label><input type="date" id="dateStart" class="datepicker form-control"></div>
+        <div class="form-group p-2"><label for="dateEnd">Tanggal Berakhir</label><input type="date" id="dateEnd" class="datepicker form-control"></div>
+      </div>
+      <div class="form-action">
+        <button class="btn btn-primary" type="submit">OK</button>
+      </div>
+    </form>
+  </div>
+</template>
+
+
+<template name="acmatkulAnnouncements">
+  <section class="section-announcements">
+    <h2 class="section-title">Pengumuman</h2>
+    {{#if greaterThan activeAnnouncements.length 0 }}
+    <fieldset class="fieldset">
+      <legend>Pengumuman Aktif</legend>
+      <ul class="list-group announcements-list">
+        {{#each activeAnnouncements }}
+        {{> amkAnnouncementListItem }}
+        {{/each}}
+      </ul>
+    </fieldset>
+    {{/if}}
+
+    {{#if ownAcmatkul }}
+    {{#if greaterThan futureAnnouncements.length 0 }}
+    <fieldset class="fieldset">
+      <legend>Pengumuman Yang Akan Terbit</legend>
+      <ul class="list-group announcements-list">
+        {{#each futureAnnouncements }}
+        {{> amkAnnouncementListItem }}
+        {{/each}}
+      </ul>
+    </fieldset>
+    {{/if}}
+    {{#if greaterThan pastAnnouncements.length 0 }}
+    <fieldset class="fieldset">
+      <legend>Pengumuman Terdahulu</legend>
+      <ul class="list-group announcements-list">
+        {{#each pastAnnouncements }}
+        {{> amkAnnouncementListItem }}
+        {{/each}}
+      </ul>
+    </fieldset>
+    {{/if}}
+    {{/if}}
+  </section>
+</template>
+
+
+
+<template name="amkAnnouncementListItem">
+  <li class="list-group-item">
+        <div class="title">{{title}}</div>
+        <div class="description">{{{ description }}}</div>
+{{#if isInRole 'admin, superadmin, dosen'}}
+  {{#if ownAcmatkul }}
+        <div class="item-actions"><a href="/announcement/{{_id}}/edit" class="btn btn-primary">Lihat</a></div>
+  {{/if}}
+{{/if}}
+      </li>
+</template>
+
+
+
+
+
+<template name="announcementEdit">
+  <div class="page page-announcement-edit">
+    <h1 class="page-title">Ubah Pengumuman</h1>
+  {{#if ownAcmatkul }}
+      <!-- {{> quickForm id="announcementEdit" collection=formCollection type="update" doc=this fields="title, description, dateStart, dateEnd" }} -->
+      <section class="section-page-shoulders">
+        <div class="btn-group" role="group" aria-label="command control">
+          <button type="button" class="btn btn-success" id="broadcastAnnouncement"><i class="fa fa-bullhorn"></i> Broadcast Email</button>
+        </div>
+      </section>
+      <form action="" id="annEditForm">
+        <div class="form-group">
+          <label for="">Mata Kuliah</label>
+          <input type="text" class="form-control disabled" value="{{formatAcmatkulName activeMatkulId }}" disabled="disabled">
+        </div>
+        <div class="form-group">
+          <label for="">Judul</label>
+          <input type="text" class="form-control" id="inputTitle" name="title" value="{{ title }}">
+        </div>
+        <div class="form-group">
+          <label for="">Deskripsi</label>
+          <textarea name="description" id="inputDescription" cols="30" rows="3" class="form-control" value="{{description}}"></textarea>
+        </div>
+        <div class="d-flex justify-content-center align-content-center form-group">
+          <div class="p-2">
+            <label for="">Tanggal Mulai</label>
+            <input type="date" name="dateStart" id="dateStart" class="form-control" value="{{formatHtmlDate dateStart }}">
+          </div>
+          <div class="p-2">
+            <label for="">Tanggal Berakhir</label>
+            <input type="date" name="dateEnd" id="dateEnd" class="form-control" value="{{formatHtmlDate dateEnd }}">
+          </div>
+        </div>
+      </form>
+      <div class="btn-group form-actions form-group">
+        <button class="btn btn-primary" id="submitForm" type="button"><i class="fa fa-save"></i>  Simpan</button>
+        <button type="button" class="btn btn-danger" id="deleteAnnouncement"><i class="fa fa-trash"></i> Hapus Pengumuman</button>
+      </div>
+  {{/if}}
+  </div>
+</template>
+
+
+
+
+<template name="myActiveAnnouncements">
+  <section class="section-announcements">
+    <h2 class="section-title">Pengumuman</h2>
+    <ul class="list-group announcements-list">
+      {{#each announcements }}
+      <li class="list-group-item">
+        <div class="title">{{title}}</div>
+        <div class="description">{{{ description }}}</div>
+  
+  {{#if ownAcmatkul }}
+        <div class="item-actions"><a href="/announcement/{{_id}}/edit" class="btn btn-primary">Lihat</a></div>
+  {{/if}}
+
+
+      </li>
+      {{/each}}
+    </ul>
+  </section>
+    {{#if greaterThan announcements.length 0 }}
+    {{ else }}
+    {{/if}}
+</template>
+
+
+
+

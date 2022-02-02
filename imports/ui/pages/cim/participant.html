@@ -1,0 +1,327 @@
+<template name="participantsList">
+  {{ #if isInRole 'cimParticipantList' }}
+    <div class="page page-user-center">
+      <div class="page-header"><h1>Daftar User External</h1></div>
+
+      <section class="section-page-shoulders">
+        <div class="btn-group" role="group" aria-label="command control">
+          {{ #if isInRole 'cimParticipantCreate'}}
+            <a href="{{ pathFor route='participantsCreate' }}" class="btn btn-primary">+ User External Baru</a>
+          {{ /if }}
+          </div>
+        <p class="mt-3">
+          <button class="btn btn-primary" id="peserta-cim">Peserta Kursus CIM</button>
+          <button class="btn btn-primary" id="user-ti">User Tanya Ivan</button>
+          <button class="btn btn-primary" id="user-cim-cms">User CIM CMS</button>
+        </p>
+        <!-- <div class="btn-group" role="group" aria-label="command control">
+          <button class="btn btn-primary" id="toggleSearch"><i class="fa fa-search"></i>Search</button>
+        </div> -->
+      </section>
+      <!-- {{#if searchOn }}
+      <section class="section-search-user">
+        {{> searchStudents}}
+      </section>
+      {{/if}} -->
+      <ul class="list-group">
+        {{#each dataList }}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a class="title name">{{ fullName }} / {{#if studentNumber }}{{studentNumber}}{{else}} - {{/if}}</a>
+            <div class="flex-shrink">
+              {{ #if isInRole 'cimParticipantEdit' }}
+              <a href="{{ pathFor route='participantsEdit' _id=profileId }}" class="btn btn-primary text-white">Ubah</a>
+              {{ /if }}
+            </div>
+          </li>
+        {{/each}}
+      </ul>
+
+    </div>
+  {{ else }}
+    {{> notAuthorized}}
+  {{ /if }}
+</template>
+
+<template name="registrationList">
+  {{ #if isInRole 'cimParticipantList' }}
+    <div class="page page-user-center">
+      <div class="page-header"><h1>Konfirmasi Registrasi</h1></div>
+
+      <section class="section-page-shoulders">
+        <div class="btn-group" role="group" aria-label="command control">
+          <a href="{{ pathFor route='registrationNew'}}" class="btn btn-primary text-white">Tambah Registrasi baru</a>
+        </div>
+      </section>
+      <!-- {{#if searchOn }}
+      <section class="section-search-user">
+        {{> searchStudents}}
+      </section>
+      {{/if}} -->
+      <ul class="list-group">
+        {{#each dataList }}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a class="title name">{{ fullName }}</a>
+            <div class="flex-shrink">
+              {{ #if isInRole 'cimParticipantEdit' }}
+              <a href="{{ pathFor route='registrationEdit'}}" class="btn btn-primary text-white">Ubah</a>
+              {{ /if }}
+            </div>
+          </li>
+        {{/each}}
+      </ul>
+
+    </div>
+  {{ else }}
+    {{> notAuthorized}}
+  {{ /if }}
+</template>
+
+<template name="registrationNew">
+  {{#if isInRole 'cimParticipantEdit' }}
+    <div class="page page-matkul-page">
+      <h1 class="page-title">Registrasi baru</h1>
+      <div class="page page-create-teacher">
+        <form action="" id="create-user-form">
+          <div class="form-group">
+            <label for="">Nomor Peserta</label>
+            <input type="text" id="noPeserta" name="noPeserta" placeholder="Nomor Peserta" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="">Email</label>
+            <input type="email" id="inputEmail" name="inputEmail" placeholder="Email" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="">Nama Panggilan</label>
+            <input type="text" id="callName" name="callName" placeholder="Nama Panggilan" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="">Nama Lengkap</label>
+            <input type="text" id="inputName" name="inputName" placeholder="Nama Lengkap" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="">Tanggal Lahir</label>
+            <input type="date" id="inputDob" name="inputDob" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="">Nama Baptis</label>
+            <input type="text" id="baptistName" name="baptistName" placeholder="Nama Baptis" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="">Alamat</label>
+            <input type="text" id="address" name="address" placeholder="Alamat" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Keuskupan</label>
+            <select name="selectDioceses" id="selectDioceses" class="select2 form-control">
+              <option value=""> ==== Pilih Keuskupan ==== </option>
+              {{#each dioceses}}
+                <option id= "base" value="{{ dioceseId }}"> {{ name }} </option>
+              {{/each}}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Paroki</label>
+            <select name="selectParokis" id="selectParokis" class="select2 form-control">
+              <option id= "base" value=""> ==== Pilih Paroki ==== </option>
+              {{#each parokis}}
+                <option value="{{ ParokiID }}"> {{churchName}} - {{ name }} </option>
+              {{/each}}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="">Lingkungan</label>
+            <input type="text" id="lingkungan" name="lingkungan" placeholder="lingkungan" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="">Whatsapp</label>
+            <input type="text" id="whatsapp" name="whatsapp" placeholder="whatsapp" class="form-control">
+          </div>
+          <div class="form-group" id="checkboxGroup">
+            <label for="">Kelas yang dipilih</label> 
+          </div>
+          <div class="form-group">
+            <label for="">Bukti Pembayaran</label><br>
+            <img id="paymentImage" src="#" alt="your image" width="300" height="300" /><br> 
+            <input type="file" id="paymentFile" name="filename" accept="image/gif, image/jpeg, image/png">     
+
+          </div>
+          <div class="form-group">
+            <label for="">Surat Rekomendasi Paroki</label><br>
+            <img id="letterImage" src="#" alt="your image" width="300" height="300" /><br>   
+            <input type="file" id="letterFile" name="filename" accept="image/gif, image/jpeg, image/png">     
+          </div>        
+          <div class="form-group">
+            <button class="btn btn-primary" id="addRegistration">Tambah</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {{else }}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+<template name="registrationEdit">
+  {{#if isInRole 'cimParticipantEdit' }}
+    <div class="page page-matkul-page">
+      <h1 class="page-title">Konfirmasi Registrasi Edit</h1>
+      <div class="page page-create-teacher">
+        <form action="" id="create-user-form">
+          <div class="form-group">
+            <label for="">Nomor Peserta</label>
+            <input type="text" id="noPeserta" name="noPeserta" placeholder="Nomor Peserta" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label for="">Email</label>
+            <input type="email" id="inputEmail" name="inputEmail" placeholder="Email" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label for="">Nama Panggilan</label>
+            <input type="text" id="callName" name="callName" placeholder="Nama Panggilan" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label for="">Nama Lengkap</label>
+            <input type="text" id="inputName" name="inputName" placeholder="Nama Lengkap" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label for="">Tanggal Lahir</label>
+            <input type="date" id="inputDob" name="inputDob" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label for="">Nama Baptis</label>
+            <input type="text" id="baptistName" name="baptistName" placeholder="Nama Baptis" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label for="">Alamat</label>
+            <input type="text" id="address" name="address" placeholder="Alamat" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label for="">Keuskupan</label>
+            <input type="text" id="keuskupan" name="Keuskupan" placeholder="Keuskupan" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label for="">Paroki</label>
+            <input type="text" id="paroki" name="paroki" placeholder="Paroki" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label for="">Lingkungan</label>
+            <input type="text" id="lingkungan" name="lingkungan" placeholder="lingkungan" class="form-control" disabled>
+          </div>
+          <div class="form-group">
+            <label for="">Whatsapp</label>
+            <input type="text" id="whatsapp" name="whatsapp" placeholder="whatsapp" class="form-control" disabled>
+          </div>
+          <div class="form-group" id="checkboxGroup">
+            <label for="">Kelas yang dipilih</label> 
+          </div>
+          <div class="form-group">
+            <label for="">Bukti Pembayaran</label><br>
+            <img alt = "No Image Found" id= "payment" src="test" height="300" width="300"/>          
+          </div>
+          <div class="form-group">
+            <label for="">Surat Rekomendasi Paroki</label><br>
+            <img alt = "No Image Found" id= "letter" src="test" height="300" width="300"/>          
+          </div>        
+          <div class="form-group">
+            <button class="btn btn-primary" id="confirm">Confirm</button>
+            <button class="btn btn-primary" id="decline">Decline</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {{else }}
+    {{> notAuthorized}}
+  {{/if}}
+</template>
+
+<template name="participantsEdit">
+    {{#if isInRole 'cimParticipantEdit' }}
+      <div class="page page-matkul-page">
+        <h1 class="page-title">User External Edit</h1>
+        {{> participantsForm submitType=2}}
+      </div>
+    {{else }}
+      {{> notAuthorized}}
+    {{/if}}
+</template>
+
+<template name="participantsCreate">
+    {{#if isInRole 'cimParticipantCreate' }}
+      <div class="page page-matkul-page">
+        <h1 class="page-title">User External Baru</h1>
+        {{> participantsForm submitType=1}}
+      </div>
+    {{else }}
+      {{> notAuthorized}}
+    {{/if}}
+</template>
+
+<template name="participantsForm">
+    <div class="page page-create-teacher">
+        <form action="" id="create-user-form">
+          <div class="form-group">
+            <label for="">Nama Lengkap</label>
+            <input type="text" id="inputName" name="inputName" placeholder="Nama Lengkap" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="">Tanggal Lahir</label>
+            <input type="date" id="inputDob" name="inputDob" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="">Email</label>
+            <input type="email" id="inputEmail" name="inputEmail" placeholder="Email" class="form-control">
+          </div>
+          {{#if equals submitType 1}}
+            <div class="form-group">
+              <label for="">Password</label>
+              <input type="password" id="inputPassword" name="inputPassword" placeholder="Email" class="form-control">
+            </div>
+          {{/if}}
+          <div class="form-group">
+            <label for="">No Peserta</label>
+            <input type="text" id="inputNumber" name="inputNumber" placeholder="No Pokok" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="">Nomor HP</label>
+            <input type="text" id="inputPhone" name="inputPhone" placeholder="No HP" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label>Roles</label>
+            <select name="selectPeranUser" id="selectPeranUser" class="select2 form-control" multiple>
+              <option value="cimStudent"> CIM - Partisipan </option>
+              <option value="tiPenjawab"> Tanya Ivan - Penjawab </option>
+              <option value="tiEditor"> Tanya Ivan - Editor </option>
+              <option value="tiAdmin"> Tanya Ivan - Admin </option>
+              <option value="articleWriter"> CMS - Penulis Artikel </option>
+              <option value="articleEditor"> CMS - Editor Artikel </option>
+              <option value="articleAdmin"> CMS - Admin Artikel </option>
+              <option value="newsWriter"> CMS - Penulis Berita </option>
+              <option value="newsEditor"> CMS - Editor Berita </option>
+              <option value="newsAdmin"> CMS - Admin Berita </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Team Ivan</label>
+            <select name="selectIvanTeams" id="selectIvanTeams" class="select2 form-control" multiple>
+              {{#each ivanTeams}}
+                <option value="{{toMeteorId _id}}"> {{ name }} </option>
+              {{/each}}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Outlet</label>
+            <select name="selectOutlets" id="selectOutlets" class="select2 form-control" multiple>
+              {{#each outlets}}
+                <option value="{{code}}"> {{ name }} - {{details}} </option>
+              {{/each}}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <button class="btn btn-primary" id="createUser">Simpan</button>
+          </div>
+        </form>
+      </div>
+</template>

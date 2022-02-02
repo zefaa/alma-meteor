@@ -1,0 +1,742 @@
+<template name="ujianInput">
+  {{#if isInRole 'admin, dosen, superadmin' }}
+  <div class="page page-ujian-input">
+    <h1 class="page-title">Input Ujian</h1>
+    {{> activeMatkulSummary}}
+    <form id="dataForm" novalidate>
+      <div class="form-group">
+        <label for="">Tipe Ujian</label>
+        <select name="typeUjian" id="selectTypeUjian" class="form-control" required>
+          <option value="">== Pilih Tipe ==</option>
+          {{#each typeUjians }}
+            <option value="{{ value }}">{{ label }}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="">Nama Ujian</label>
+        <input type="text" name="ujianName" id="inputname" class="form-control" value="" required>
+      </div>
+      <div class="form-group">
+        <label for="">Tanggal Mulai</label>
+        <input id="dateStart" class="datepicker form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="">Tanggal Selesai</label>
+        <input id="dateEnd" class="datepicker form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="">Waktu Ujian (Dalam Menit)</label>
+        <input type="number" name="time" id="inputTime" class="form-control" value="" required>
+      </div>
+      <div class="form-group">
+        <label for="">Instruksi Pengerjaan Ujian</label>
+        <textarea name="inputInstructionUjian" id="inputInstructionUjian" 
+                  cols="30" rows="3" class="form-control" value="" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="">Soal Ujian</label>
+        <textarea name="inputSoalUjian" id="inputSoalUjian" cols="30" rows="4" class="wysiwyg form-control" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="">Unggahan dokumen?</label>
+        <div class="input-wrapper input-unggahan-wrapper">
+          <div class="radio-wrapper1">
+            <input type="radio" name="input-unggahan" id="input-unggahan-1" value="true">
+            <label for="input-unggahan-1">Ya</label>
+          </div>
+          <div class="radio-wrapper1">
+            <input type="radio" name="input-unggahan" id="input-unggahan-2" value="false">
+            <label for="input-unggahan-2">Tidak</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="">Catatan</label>
+        <textarea name="inputNote" id="inputNote" cols="30" rows="4" class="wysiwyg form-control"></textarea>
+      </div>
+      <div class="page-actions">
+        <input class="btn btn-primary" value="OK" type="submit"/>
+      </div>
+    </form>
+  </div>
+  {{/if}}
+</template>
+
+
+
+
+
+
+<template name="ujiansList">
+  {{#if isInRole 'admin, dosen, superadmin' }}
+
+  <div class="page page-ujian-list">
+    <h1 class="page-title">Ujian List</h1>
+    <ul class="list-group">
+      {{#each ujians}}
+      <li class="list-group-item">
+        <a href="/ujian/{{ _id }}">
+          {{formatAcmatkulName activeMatkulId}} {{ name }} {{formatHRDate date }}
+        </a>
+      </li>
+      {{/each}}
+    </ul>
+  </div>
+  {{/if}}
+</template>
+
+<template name="ujianDetails">
+  {{#if isInRole 'admin, dosen, superadmin' }}
+  <div class="page page-ujian-details">
+    <h1 class="page-title">{{ name }}</h1>
+    {{#if ownAcmatkul }}
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <button data-view-target="0" class="btn btn-primary toggle-view">Detil Ujian</button>
+        <button data-view-target="1" class="btn btn-primary toggle-view">Tabel Nilai</button>
+        <!-- <a class="btn btn-primary" id="inputScore" href="/ujian/{{ _id }}/inputScore" target="">Input Nilai</a> -->
+        <!-- <a class="btn btn-primary" id="print" href="/ujian/{{ _id }}/print" target="_blank">Print Ujian</a> -->
+        <!-- <a class="btn btn-primary" id="printAttendance" href="/ujian/{{ _id }}/printAttendance" target="_blank">Print Attendance</a> -->
+        <!-- <a class="btn btn-primary" id="printAttendance" href="/ujian/{{ _id }}/printScores" target="_blank">Print Nilai</a> -->
+        <a class="btn btn-warning" id="edit" href="/ujian/{{ _id }}/edit">Ubah</a>
+      </div>
+    </section>
+    {{/if}}
+
+    {{#if equals viewMode 0}}
+      {{>ujianSummaryTable}}
+      {{> soalUjian}}
+    {{/if}}
+
+    {{#if equals viewMode 1}}
+      {{> ujianScoreTable}}
+    {{/if}}
+
+    <!-- {{>ujianScoreTable}} -->
+  </div>
+  {{/if}}
+</template>
+
+
+<template name="ujianSummaryTable">
+  <table class="table-sm summary-table">
+      <tr>
+        <td>Ujian</td>
+        <td class="name">{{formatTUjian typeUjian }} - {{ activeMatkulName }} - {{ matkulName }}</td>
+      </tr>
+      <tr>
+        <td>Tanggal</td>
+        <td>{{formatHRDate dateStart }} - {{formatHRDate dateEnd }}</td>
+      </tr>
+      <tr>
+        <td>Waktu</td>
+        <td>{{ time }} menit</td>
+      </tr>
+      <tr>
+        <td>Dosen</td>
+        <td class="name">{{formatFullname dosenId }}</td>
+      </tr>
+    </table>
+</template>
+
+<template name="soalUjian">
+  <fieldset class="fieldset soal-ujian">
+    <legend>Soal</legend>
+    <div class="instruction">
+      <strong>Instruksi: </strong> {{{ instructionUjian }}}
+    </div>
+    <div>{{{ soalUjian }}}</div>
+  </fieldset>
+</template>
+
+<template name="ujianScoreTable">
+  {{#if isInRole 'admin, dosen, superadmin' }}
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th width="100" class="text-right">Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each students}}
+      <tr>
+        <td>{{formatFullname studentId }}</td>
+        <td class="text-right">
+          {{#if answer }}
+            {{#if score}}
+              {{#if canSee this }}
+              <a class="" target="_blank" rel="noreferrer" href="/ujian/{{ ../_id }}/grade/{{ studentId }}">
+                {{score}}
+              </a>
+              {{else}}
+                {{score}}
+              {{/if}}
+            {{else}}
+              <a class="btn btn-primary" target="_blank" rel="noreferrer" href="/ujian/{{ ../_id }}/grade/{{ studentId }}"><i class="fa fa-pencil-square"></i> Beri Nilai</a>
+            {{/if}}
+          {{else}}
+          {{/if}}
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+    </table>
+    {{/if}}
+</template>
+
+<template name="ujianEdit">
+  {{#if isInRole 'admin, dosen, superadmin' }}
+
+  <div class="page page-ujian-edit">
+    <h1 class="page-title">Edit {{ name }}</h1>
+    <div class="page-body">
+      {{> quickForm id="ujianEdit" collection=formCollection type="update" doc=this omitFields="students" }}
+      {{#if ownAcmatkul }}
+      <button class="btn btn-danger" type="button" id="deleteUjian"><i class="fa fa-trash"></i> Delete</button>
+      {{/if}}
+    </div>
+  </div>
+  {{/if}}
+</template>
+
+
+
+<template name="ujianPrint">
+  <div class="page page-ujian-print">
+    {{> kopSurat}}
+    {{> ujianSummaryTable}}
+    {{> soalUjian}}
+  </div>
+</template>
+
+<template name="ujianReport">
+  {{#if isInRole 'admin, dosen, superadmin' }}
+
+  <div class="page page-ujian-report">
+    <h1 class="page-title">Daftar Nilai</h1>
+    {{> activeMatkulSummary}}
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>No Pokok</th>
+          <th>Nama</th>
+          <th>Tugas</th>
+          <th>Quiz/Test</th>
+          <th>UTS</th>
+          <th>UAS</th>
+          <th>Final Score</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{#each ujianByTypes}}
+        <tr class="">
+          <td width="15">{{ incremented @index }}</td>
+          <td width="30">{{formatNopokok studentId }}</td>
+          <td width="200" class="name">{{formatFullname studentId }}</td>
+          {{#each ujianTypes }}
+            <td>
+            {{#each ../ujians}}
+              {{#if equals ujianType .. }}
+                {{ score }} {{#if greaterThan this.score.length 1}} ({{avgScore}}) {{/if}}
+              {{else}}
+              {{/if}}
+            {{/each}}
+            </td>
+          {{/each}}
+          <td>
+            {{ finalScore }}
+          </td>
+        </tr>
+      {{/each}}
+      </tbody>
+    </table>
+  </div>
+  {{/if}}
+</template>
+
+
+
+
+
+<template name="ujianDetailsPrintAttendance">
+  {{#if isInRole 'admin, dosen, superadmin' }}
+  <div class="page page-ujian-print">
+    {{> kopSurat}}
+    {{> ujianSummaryTable}}
+    <section class="section-students-list">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th width="25">No</th>
+            <th width="100">No Pokok</th>
+            <th>Nama Peserta Ujian</th>
+            <th width="200">Tanda Tangan</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each acmatkulStudents}}
+          <tr>
+            <td class="no-index">{{incremented @index}}</td>
+            <td class="nopokok">{{formatNopokok studentId }}</td>
+            <td class="name">{{formatFullname studentId }}</td>
+            <td width="200">&nbsp;&nbsp;&nbsp;</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </section>
+  </div>
+  {{/if}}
+</template>
+
+
+<template name="ujianDetailsPrintScores">
+  {{#if isInRole 'admin, dosen, superadmin' }}
+
+  <div class="page page-ujian-print">
+    {{> kopSurat}}
+    {{> ujianSummaryTable}}
+    <section class="section-students-list">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Nama Peserta Ujian</th>
+            <th>Nilai</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each students}}
+          <tr>
+            <td class="name">{{formatFullname studentId }} {{ fullname }}</td>
+            <td width="200">{{ score }}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </section>
+  </div>
+  {{/if}}
+</template>
+
+
+
+
+<template name="inputScoreView">
+  {{#if isInRole 'admin, dosen, superadmin' }}
+
+  <div class="page page-input-score-view">
+    <h1 class="page-title">Input Nilai Ujian</h1>
+    <!-- <h2 class="page-subtitle">{{formatTUjian typeUjian }} / {{formatHRDate date }} {{ time }}</h2> -->
+  </div>
+  <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <button class="btn btn-primary" id="toggleInputWM">Input Nilai WM</button>
+      </div>
+    </section>
+  {{> ujianSummaryTable}}
+  <div class="input-score-table">
+    <form action="" id="input-score-table-form">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Nama Mahasiswa</th>
+            <th>{{#if inputWM }} Nilai WM - {{/if}}Nilai IMAVI</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each acmatkulStudents }}
+          <tr>
+            <td class="name">{{formatFullname studentId }}</td>
+            <td class="text-right" width="200">
+              <div class="input-score-view d-flex align-items-center">
+                {{#if inputWM }}
+                <input type="number" min="0" max="100" name="{{ studentId }}" class="form-control inputScoreWM p-2" value="{{ scoreWM }}">
+                {{/if}}
+                <input type="number" min="0" max="100" name="{{ studentId }}" class="form-control inputScoreImavi p-2" value="{{ score }}">
+              </div>
+              </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      <button class="btn btn-block btn-success" id="submitScores" type="submit">OK</button>
+    </form>
+  </div>
+{{/if}}
+</template>
+
+
+
+
+<template name="ujiansListActive">
+  <div class="page page-ujian-list">
+    <h1 class="page-title">Daftar Ujian: <br> {{formatPs currentPsId }}</h1>
+
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <button class="btn btn-primary" id="setViewFuture">Yang Akan Datang</button>
+        <button class="btn btn-primary" id="setViewPast">Yang Lalu</button>
+      </div>
+    </section>
+
+{{#if ujiansFuture }}
+    <section class="section-ujians-future">
+      <h2 class="section-title">Yang Akan Datang</h2>
+
+    <ul class="list-group">
+
+  {{#if isInRole 'admin, superadmin' }}
+      {{#each ujians}}
+      <li class="list-group-item">
+        <a href="/ujian/{{ _id }}" class="d-flex justify-content-between">
+          <div class="p-2">
+          <span class="label timestamp">{{formatHRDate date }}</span>
+          <span class="label ujiantype">{{formatTUjian typeUjian }}</span>
+          <!-- {{ name }} -->
+          <span class="title">{{formatAcmatkulName activeMatkulId}}</span>
+          </div>
+          <div class="p-2">
+          <span class="label dosen">{{formatFullname dosenId }}</span>
+          </div>
+        </a>
+      </li>
+      {{/each}}
+  {{/if }}
+
+
+  {{#if isInRole 'dosen, admin, superadmin' }}
+      {{#each myUjiansDosen}}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div class="p-2">
+          <span class="label timestamp">{{formatHRDate date }}</span>
+          <span class="label ujiantype">{{formatTUjian typeUjian }}</span>
+          <!-- {{ name }} -->
+          <span class="title">{{formatAcmatkulName activeMatkulId}}</span>
+          </div>
+          <div class="p-2">
+          <span class="label dosen">{{formatFullname dosenId }}</span>
+          </div>
+        <a href="/ujian/{{ _id }}" class="">
+          <i class="fa fa-eye"></i>
+        </a>
+      </li>
+      {{/each}}
+  {{/if}}
+
+  {{#if isInRole 'student' }}
+    {{#each myUjiansStudent}}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div class="p-2">
+          <span class="label timestamp">{{formatHRDate date }}</span>
+          <span class="label ujiantype">{{formatTUjian typeUjian }}</span>
+          <!-- {{ name }} -->
+          <span class="title">{{formatAcmatkulName activeMatkulId}}</span>
+          </div>
+          <div class="p-2">
+          <span class="label dosen">{{formatFullname dosenId }}</span>
+          </div>
+      </li>
+      {{/each}}
+
+
+  {{/if}}
+    </ul>
+  </section>
+{{ else }}
+  <section class="section-ujians-past">
+    <h2 class="section-title">Yang Lalu</h2>
+    <ul class="list-group">
+
+  {{#if isInRole 'admin, superadmin' }}
+      {{#each ujiansPast}}
+      <li class="list-group-item">
+        <a href="/ujian/{{ _id }}" class="d-flex justify-content-between">
+          <div class="p-2">
+          <span class="label timestamp">{{formatHRDate date }}</span>
+          <span class="label ujiantype">{{formatTUjian typeUjian }}</span>
+          <!-- {{ name }} -->
+          <span class="title">{{formatAcmatkulName activeMatkulId}}</span>
+          </div>
+          <div class="p-2">
+          <span class="label dosen">{{formatFullname dosenId }}</span>
+          </div>
+        </a>
+      </li>
+      {{/each}}
+  {{/if}}
+
+
+  {{#if isInRole 'dosen, admin, superadmin' }}
+      {{#each myUjiansDosenPast}}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div class="p-2">
+          <span class="label timestamp">{{formatHRDate date }}</span>
+          <span class="label ujiantype">{{formatTUjian typeUjian }}</span>
+          <!-- {{ name }} -->
+          <span class="title">{{formatAcmatkulName activeMatkulId}}</span>
+          </div>
+          <div class="p-2">
+          <span class="label dosen">{{formatFullname dosenId }}</span>
+          </div>
+        <a href="/ujian/{{ _id }}" class="">
+          <i class="fa fa-eye"></i>
+        </a>
+      </li>
+      {{/each}}
+  {{/if}}
+
+  {{#if isInRole 'student' }}
+    {{#each myUjiansStudentPast}}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div class="p-2">
+          <span class="label timestamp">{{formatHRDate date }}</span>
+          <span class="label ujiantype">{{formatTUjian typeUjian }}</span>
+          <!-- {{ name }} -->
+          <span class="title">{{formatAcmatkulName activeMatkulId}}</span>
+          </div>
+          <div class="p-2">
+          <span class="label dosen">{{formatFullname dosenId }}</span>
+          </div>
+      </li>
+      {{/each}}
+  {{/if}}
+    </ul>
+    </section>
+{{/if}}
+  </div>
+</template>
+
+
+
+
+<template name="ujianDo">
+  {{#if stillLoading }}
+  {{> nowLoading }}
+  {{else}}
+  <div class="page page-ujian-do">
+    {{> ujianPrint}}
+    <div class="spacer text-center"> ============================ </div>
+    <fieldset class="fieldset soal-ujian">
+      <legend>Waktu Tersisa</legend>
+      <h3>{{remainingTime}} menit</h3>
+    </fieldset>
+    <section class="section-answer-sheet mt-5">
+      <fieldset class="fieldset soal-ujian">
+      <legend>Jawaban</legend>
+      <div class="form-group">
+        <textarea name="answer" id="answer" cols="30" rows="10" class="form-control summer"></textarea>
+      </div>
+
+    </fieldset>
+
+
+    {{#if uploadStatus }}
+      <fieldset class="fieldset soal-ujian">
+        <legend>Unggah File</legend>
+        <div class="form-item form-group">
+          <div class="uploading">
+              {{#with currentUpload}}
+                  <p>Mengunggah <b>{{file.name}}</b>:</p>
+                  <span id="progress">{{progress.get}}%</span>
+              {{else}}
+                  <div>
+                      <input multiple="multiple" class="hidden" id="unggahTugas" type="file" disabled="{{lockAnswer}}"/>
+                      <label class="btn btn-primary btn-lg {{#if lockAnswer}}disabled{{/if}}" for="unggahTugas">Unggah</label>
+                  </div>
+              {{/with}}
+          </div>
+          
+          {{#if greaterThan ujianFilesList.length 0 }}
+              <div class="d-flex flex-wrap">
+                  {{#each ujianFilesList }}
+                      {{#with thisFile }}
+                          <div class="uploaded-image m-2">
+                              {{#if isImage }}
+                                  <a href="{{ link }}" class="fancybox image" data-fancybox="chronicle-files">
+                                      <img src="{{ link }}" alt="{{ name }}" class="thumbnail">
+                                  </a>
+                              {{else}}
+                                <a href="{{ link }}" class="btn btn-primary btn-lg" target="_blank" rel="noreferrer">
+                                  <i class="fa fa-file"></i>
+                                  <p>{{ name }}</p>
+                                </a>
+                              {{/if}}
+                              <!-- pakai X, karena jika pakai icon dan meski sudah dikasih aria, malah iconnya yang kebaca eventnya -->
+                              <button class="btn btn-danger remove-image {{#if lockAnswer}}disabled{{/if}}"
+                                      buttonData="{{_id}}">
+                                X
+                              </button>
+                          </div>
+                      {{/with}}
+                  {{/each}}
+              </div>
+          {{/if}}
+        </div>
+      </fieldset>
+    {{/if}}
+
+    <div class="form-actions text-center">
+      <button class="btn btn-primary btn-block" id="submit-form">Kumpulkan</button>
+    </div>
+    </section>
+  </div>
+  {{/if}}
+</template>
+
+<!-- untuk hasil dari gambar yang diedit mesti begitu
+karena kelemahan dari filecollection, yang hanya bisa diakses linknya lewat html -->
+
+<template name="gradingCanvas">
+  {{#if isInRole 'admin, dosen, superadmin' }}
+    {{#if imageExist}}
+      <canvas id="scoring-canvas">
+      </canvas>
+    {{/if}}
+  {{/if}}
+  {{#each ujian in ujianFilesList}}
+    {{#with thisFile ujian }}
+      {{#if isImage }}
+        <div id="{{_id}}-container" class="review-image">
+              <div class="{{#if equals currentId _id}}display-none{{/if}}">
+                <img id="{{_id}}-canvas-edited-image" 
+                      src="{{#if checkEdited _id}}
+                            {{checkEdited _id}}
+                          {{else}}
+                            {{#with editedFile ujian }}
+                                {{link}}
+                            {{/with}}
+                          {{/if}}"
+                      class="{{#if originalImage _id}}
+                              display-none
+                            {{/if}}">
+                <img id="{{_id}}-canvas-image" src="{{ link }}" alt="{{ name }}"
+                      class="{{#if notEqual (originalImage _id) true}}
+                              display-none
+                            {{/if}}">
+              </div>
+              {{#if equals currentId _id}}
+                <button class="btn btn-warning canvas-toggle canvas-close">
+                  <i class="fa fa-save"></i>
+                </button>
+              {{else}}
+                {{#if isInRole 'admin, dosen, superadmin' }}
+                  <button class="btn btn-success canvas-toggle canvas-open">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                {{/if}}
+                {{#if originalImage _id}}
+                  <button class="btn btn-original canvas-toggle btn-info mt-5">
+                    <i class="fa fa-sticky-note"></i>
+                  </button>
+                {{else}}
+                  <button class="btn btn-original canvas-toggle btn-info mt-5">
+                    <i class="fa fa-image"></i>
+                  </button>
+                {{/if}}
+              {{/if}}
+        </div>
+        <textarea name="{{_id}}-description" id="{{_id}}-description"
+                 style="margin-top: 2%;margin-bottom: 15%" value="{{ujian.description}}"
+                 disabled="{{#if isInRole 'admin, dosen, superadmin' }}{{else}}true{{/if}}"
+                 cols="30" rows="3" class="form-control" placeholder="Masukkan deskripsi"></textarea>
+      {{/if}}
+    {{/with}}
+  {{/each}}
+  <div id="canvas-control" class="display-none">
+    <label for="drawing-line-width">Line width:</label>
+    <span class="info">5</span><input type="range" value="5" min="0" max="150" id="drawing-line-width"><br>
+    <label for="drawing-color">Line color:</label><br>
+    <input type="color" value="#B22222" id="drawing-color"><br>
+    <button class="btn btn-danger mt-5" id="clear-canvas">Bersihkan canvas</button>
+  </div>
+</template>
+
+
+
+<template name="ujianGrade">
+  {{#if stillLoading }}
+    {{> nowLoading }}
+  {{else}}
+  {{#if submitted }}
+  <div class="page page-ujian-do">
+    {{> ujianPrint}}
+    <div class="spacer text-center"> ============================ </div>
+    <section class="section-answer-sheet">
+      <fieldset class="fieldset soal-ujian">
+      <legend>Jawaban {{formatFullname sdata.studentId }}</legend>
+      <div class="form-group">
+        {{{ sdata.answer }}}
+      </div>
+      {{#if greaterThan sdata.ujianFile.length 0 }}
+      {{#each ujian in sdata.ujianFile }}
+        {{#with thisFile ujian }}
+          {{#if equals isImage false}}
+            <div class="row mt-2">
+              <div class="col-4">
+                <a href="{{ link }}" class="btn btn-primary btn-lg m-2" target="_blank" rel="noreferrer">
+                  <i class="fa fa-file"></i>
+                  <p>{{ name }}</p>
+                </a>
+              </div>
+              <div class="col-2">
+                <input  class="hidden unggahTugas" id="{{_id}}-unggahTugas" type="file" />
+                <label class="btn btn-info btn-lg ml-2 mt-2" for="{{_id}}-unggahTugas">Unggah File</label>
+              </div>
+            </div>
+          {{/if}}
+        {{/with}}
+      {{/each}}
+    {{/if}}
+      <fieldset class="fieldset soal-ujian mt-5">
+        <legend>File Pemeriksaan</legend>
+        <div class="d-flex flex-wrap">
+          {{#each tempFiles }}
+            <div class="btn btn-info btn-lg m-2">
+              <i class="fa fa-file"></i>
+              <p>{{ file.name }}</p>
+            </div>
+          {{/each}}
+        </div>
+      </fieldset>
+    </fieldset>
+
+    </section>
+    <section class="section-grading-sheet mt-5">
+      <fieldset class="fieldset grade-ujian">
+        <legend>Penilaian</legend>
+        {{>gradingCanvas ujianFile=sdata.ujianFile parentInstance=parentInstance}}
+        <div class="form-group">
+          <label for="">Nilai</label>
+          {{#if isInRole 'admin, dosen, superadmin' }}
+            <input type="number" id="score" name="score" class="form-control" value="{{ sdata.score }}">
+          {{else}}
+            <input type="number" id="score" name="score" class="form-control" value="{{ sdata.score }}" disabled="disabled">
+          {{/if}}
+        </div>
+        <div class="form-group">
+          <label for="">Catatan Penilai</label>
+          {{#if isInRole 'admin, dosen, superadmin' }}
+            <textarea name="note" id="note" cols="30" rows="3" class="form-control summer" value="{{ sdata.note }}"></textarea>
+          {{else}}
+            <textarea name="note" id="note" cols="30" rows="3" class="form-control summer" value="{{ sdata.note }}" disabled="disabled"></textarea>
+          {{/if}}
+        </div>
+        {{#if isInRole 'admin, dosen, superadmin' }}
+          <div class="form-actions text-center">
+            <button class="btn btn-primary btn-block" id="submit-form">OK</button>
+          </div>
+        {{/if}}
+      </fieldset>
+    </section>
+  </div>
+  {{else}}
+  <div class="panel panel-lg">
+    <p>Mahasiswa belum mengerjakan.</p>
+  </div>
+  {{/if}}
+  {{/if}}
+</template>

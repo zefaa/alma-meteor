@@ -1,0 +1,528 @@
+import { Meteor } from 'meteor/meteor';
+
+import { Template } from 'meteor/templating';
+import { ReactiveVar } from 'meteor/reactive-var';
+import { ReactiveDict } from 'meteor/reactive-dict';
+import SimpleSchema from 'simpl-schema';
+import _ from 'underscore';
+import textareaAutoSize from 'textarea-autosize';
+
+
+import { ScoreSheets } from '../../../api/alma-v1/db/collections-assessment.js';
+import { ScoringItemGroups } from '../../../api/alma-v1/db/collections-assessment.js';
+import { ScoringItems } from '../../../api/alma-v1/db/collections-assessment.js';
+import { ScoringTemplates } from '../../../api/alma-v1/db/collections-assessment.js';
+import { ItemAnswers } from '../../../api/alma-v1/db/collections-assessment.js';
+
+import { Tingkats } from '../../../api/alma-v1/db/collections.js';
+import { PeriodeStudis } from '../../../api/alma-v1/db/collections.js';
+
+
+import '../main.html';
+import './sheets.html';
+
+SimpleSchema.debug = true;
+
+const arr = new ReactiveArray([
+]);
+
+
+Template.scoringItemForm.helpers({
+  formCollection: function () {
+    return ScoringItems;
+  }
+});
+
+
+
+
+
+
+Template.scoringItemsList.onCreated(function(){
+  this.scoringItemsList = new ReactiveVar(false);
+});
+
+
+Template.scoringItemsList.helpers({
+  formCollection () {
+    return ScoringItems;
+  },
+  scoringItemForm(){
+    return Template.instance().scoringItemsList.get();
+  },
+  scoringItem () {
+    return ScoringItems.find({}, {
+    });
+  }
+});
+
+Template.scoringItemsList.events({
+  'click #toggle-scoring-form': function (event, template) {
+    event.preventDefault();
+    template.scoringItemsList.set( !template.scoringItemsList.get());
+  },
+});
+
+
+
+
+Template.itemAnswerForm.helpers({
+  formCollection: function () {
+    return ItemAnswers;
+  }
+});
+
+Template.itemAnswerEdit.helpers({
+  formCollection: function () {
+    return ItemAnswers;
+  }
+});
+
+Template.itemAnswersList.onCreated(function(){
+  this.itemAnswerForm = new ReactiveVar(false);
+});
+
+
+Template.itemAnswersList.helpers({
+  formCollection () {
+    return ItemAnswers;
+  },
+  itemAnswerForm(){
+    return Template.instance().itemAnswerForm.get();
+  },
+  itemAnswer () {
+    return ItemAnswers.find({}, {
+    });
+  }
+});
+
+
+Template.itemAnswersList.events({
+  'click #toggle-periode-form': function (event, template) {
+    event.preventDefault();
+    template.itemAnswerForm.set( !template.itemAnswerForm.get());
+  },
+  'click .deleteAnswer': function(event, template){
+    event.preventDefault();
+    let answerId = this._id;
+    console.log(answerId);
+    Meteor.call('deleteAnswer', answerId, function (error, result) {
+      if (error) {
+        Bert.alert({
+          title: 'Error',
+          message: error.reason,
+          type: 'danger',
+          style: 'growl-top-right',
+          icon: 'fa-times'
+        });
+      } else {
+        Bert.alert({
+          title: 'Success',
+          message: result,
+          type: 'success',
+          style: 'growl-top-right',
+          icon: 'fa-thumbs-up'
+        });
+      }
+    });
+  }
+
+});
+
+
+
+
+
+
+Template.scoringItemGroupForm.helpers({
+  formCollection: function () {
+    return ScoringItemGroups;
+  }
+});
+
+
+Template.scoringItemGroupsList.onCreated(function(){
+  this.scoringItemGroupForm = new ReactiveVar(false);
+});
+
+
+Template.scoringItemGroupsList.helpers({
+  formCollection () {
+    return ScoringItemGroups;
+  },
+  scoringItemGroupForm(){
+    return Template.instance().scoringItemGroupForm.get();
+  },
+  itemGroup () {
+    return ScoringItemGroups.find({}, {
+    });
+  }
+});
+
+Template.scoringItemGroupsList.events({
+  'click #toggle-scoring-group-form': function (event, template) {
+    event.preventDefault();
+    template.scoringItemGroupForm.set( !template.scoringItemGroupForm.get());
+  },
+});
+
+
+
+
+
+
+
+
+
+
+Template.scoringTemplateForm.helpers({
+  formCollection: function () {
+    return ScoringTemplates;
+  }
+});
+
+const scoringTemplateFormHook = {
+  onSuccess: function(formType, result) {
+    const qitemArray = [];
+    let thisTemplate = ScoringTemplates.findOne({
+      "_id": result
+    });
+    console.log(thisTemplate);
+    let groupArray = thisTemplate.scoringItemGroup;
+    console.log(groupArray);
+
+    let qArray = _.each(groupArray, function(el) {
+      console.log(el);
+      console.log(el.scoringItem);
+      let itemArray = _.each(el.scoringItem, function(item){
+        console.log(item);
+        qitemArray.push(item);
+        console.log(qitemArray);
+      })
+    });
+    Meteor.call('registerQuestion', qitemArray, function (error, result) {
+      if (error) {
+        Bert.alert({
+          title: 'Error',
+          message: error.reason,
+          type: 'danger',
+          style: 'growl-top-right',
+          icon: 'fa-times'
+        });
+      } else {
+        Bert.alert({
+          title: 'Success',
+          message: result,
+          type: 'success',
+          style: 'growl-top-right',
+          icon: 'fa-thumbs-up'
+        });
+      }
+    });
+  },
+  // formToDoc: function(doc){
+  //   let groupArray = doc.scoringItemGroup;
+  //     console.log(groupArray);
+
+  //   let qArray = _.each(groupArray, function(el) {
+  //     console.log(el);
+  //     console.log(el.scoringItem);
+  //     let itemArray = _.each(el.scoringItem, function(item){
+  //       console.log(item);
+  //       console.log(item.question);
+  //     })
+  //   });
+  // }
+}
+
+AutoForm.addHooks(['scoringTemplateForm'], scoringTemplateFormHook);
+
+
+
+
+Template.scoringTemplateEdit.helpers({
+  formCollection: function () {
+    return ScoringTemplates;
+  }
+});
+
+Template.scoringTemplateEdit.events({
+  'click .delete': function (event, template) {
+    let templateId = Router.current().params._id;
+    Meteor.call('deleteTemplate', templateId, function (error, result) {
+      if (error) {
+        Bert.alert({
+          title: 'Error',
+          message: error.reason,
+          type: 'danger',
+          style: 'growl-top-right',
+          icon: 'fa-times'
+        });
+      } else {
+        Bert.alert({
+          title: 'Success',
+          message: result,
+          type: 'success',
+          style: 'growl-top-right',
+          icon: 'fa-thumbs-up'
+        });
+      }
+    });
+  }
+});
+
+
+Template.scoringTemplateList.helpers({
+  scoringTemplate: function () {
+    return ScoringTemplates.find({}, {
+      sort: {
+        "name": 1
+      }
+    });
+  }
+});
+
+
+
+Template.scoringTemplateDetails.helpers({
+  tingkat: function () {
+  let thisTemplateId = Router.current().params._id;
+    return Tingkats.find({
+      "templateId": thisTemplateId
+    }, {
+      sort: {
+        "tingkatId": 1
+      }
+    }).fetch();
+  },
+  thisGroup () {
+    return ScoringItemGroups.findOne({
+      "_id": this.groupId
+    });
+  }
+});
+
+
+
+
+
+Template.scoreSheetForm.onCreated( function(){
+
+  let subjectId = Router.current().params._id;
+  let tingkat = Tingkats.findOne({"tingkatId": this.data.tingkat});
+
+  Tracker.autorun(() => {
+    Meteor.subscribe('thisScoringTemplate');
+    Meteor.subscribe('periodeStudis', function(){
+      console.log("periodestudis is ready");
+    });
+    Meteor.subscribe('scoresheetSearch', subjectId, function(){
+      console.log("scoresheetsearch ready")
+    });
+    Meteor.subscribe('tingkats', function() {
+      console.log("tingkats ready")
+    })
+    Meteor.subscribe('scoringTemplates', function() {
+      console.log("scoringTemplates ready")
+    })
+    
+  });
+
+  arr.clear();
+
+  let thisTemplate = ScoringTemplates.findOne({"_id": tingkat.templateId});
+
+  this.selectedTemplate = new ReactiveVar(thisTemplate);
+  this.selectedAnswers = new ReactiveDict();
+  this.showCreateForm = new ReactiveVar(false);
+
+  let currentPeriodeStudi = PeriodeStudis.findOne({
+    "status": true
+  });
+
+  let currentPS = currentPeriodeStudi._id
+  this.currentPS = new ReactiveVar(currentPS);
+});
+
+Template.scoreSheetForm.onRendered( function(){
+  $('textarea').textareaAutoSize();
+})
+
+
+Template.scoreSheetForm.helpers({
+  formTemplate(){
+    return Template.instance().selectedTemplate.get();
+  },
+	scoringItems(){
+		return ScoringItems.find();
+	},
+  formCollection: function () {
+    return ScoreSheets;
+  },
+  sheetTemplate() {
+    return ScoringTemplates.find();
+  },
+  selectedTempate(){
+    let templateId = Template.instance().selectedTemplate.get();
+    let thisTemplate = ScoringTemplates.findOne({
+      "_id": templateId
+    });
+    return thisTemplate.name;
+  },
+  itemGroup() {
+    let selectedTemplate = Template.instance().selectedTemplate.get();
+    if ( selectedTemplate !== null ) {
+	    return selectedTemplate.scoringItemGroup;
+    } else {
+    	return null;
+    }
+  },
+  thisGroup(){
+    // let selectedTemplate = Template.instance().selectedTemplate.get();
+    // let thisGroupId = selectedTemplate.scoringItemGroup.groupId;
+  	let thisGroup = ScoringItemGroups.findOne({"_id": this.groupId}, {});
+  	return thisGroup;
+  	console.log(thisGroup);
+  },
+  thisItem(){
+  	let itemId = this;
+    let thisItem = ScoringItems.findOne({ _id: itemId });
+    return thisItem;
+  },
+  answers(){
+  	return ItemAnswers.find();
+  },
+  yetAssessed(){
+    let thisSubject = Router.current().params._id;
+    let thisUser = Meteor.userId();
+    let currentPS = PeriodeStudis.findOne({
+      "status": true
+    });
+    let userAssessment = ScoreSheets.findOne({
+      "subjectId": thisSubject,
+      "createdBy": thisUser,
+      "periodeStudi": currentPS._id
+    }, {
+    });
+    console.log(userAssessment === undefined);
+    return userAssessment === undefined;
+  },
+  assessedOn(){
+    let thisSubject = Router.current().params._id;
+    let thisUser = Meteor.userId;
+    let currentPS = Template.instance().currentPS.get();
+    let thisScoreSheet = ScoreSheets.findOne({
+      "subjectId": thisSubject,
+      "createdBy": thisUser,
+      "periodeStudi": currentPS,
+    });
+    return thisScoreSheet.timestamp;
+  }
+});
+
+Template.scoreSheetForm.events({
+  'change #selectTemplate': function (event, template) {
+    event.preventDefault();
+    let templateId = $(event.target).val();
+    let thisTemplate = ScoringTemplates.findOne({
+      "_id": templateId
+    });
+
+    template.selectedTemplate.set(thisTemplate);
+  },
+
+  "click #submit-scoresheet-form": function(event, template){
+    event.preventDefault();
+    let thisGuyId = Router.current().params._id;
+    let selectedTemplate = Template.instance().selectedTemplate.get();
+    let selectedTemplateItemGroups = selectedTemplate.scoringItemGroup;
+    let templateId = template.selectedTemplate.get()._id;
+
+    let formatorPass = $('input[name="rekomendasi-formator"]:checked').val();
+    let formatorNote = $('#formator-note').val();
+
+    const rawFormData = $('#sheetForm').serializeArray();
+    console.log(rawFormData);
+
+    var formData = {};
+
+    $.map(rawFormData, function(n, i){
+        formData[n['name']] = n['value'];
+    });
+    console.log(formData)
+
+    // console.log(formData)
+    // _.each(formData, function(el){
+    //   console.log(el)
+    // })
+
+    // let scoreData = [];
+
+    // _.each(selectedTemplateItemGroups, function(elGroup) {
+    //   console.log(elGroup.groupId);
+    //   let groupData = {
+    //     "groupId": elGroup.groupId,
+    //     "scoreItem": [
+    //     ]
+    //   }
+    //   scoreData.push(groupData);
+    //   console.log(groupData);
+    //   console.log(scoreData);
+    //   _.each(elGroup.scoringItem, function(el){
+    //     console.log(el.itemId);
+    //     let itemAnswer = $("input[name='el.itemId']").val();
+    //     console.log(itemAnswer);
+    //   });
+    // });
+
+    Meteor.call('addScoreSheet', thisGuyId, rawFormData, templateId, formatorPass, formatorNote, function (error, result) {
+       if (error) {
+        console.log(error.reason);
+        Bert.alert({
+          title: 'Error',
+          message: error.reason,
+          type: 'danger',
+          style: 'growl-top-right',
+          icon: 'fa-times'
+        });
+      } else {
+        console.log(result);
+        Router.go("home");
+      }
+    });
+  },
+  'click .test-question': function(event, template) {
+    event.preventDefault();
+    let itemId = this._id;
+    let thisItem = ScoringTemplates.find({
+      "scoringItemGroup.scoringItem._id": itemId
+    }).fetch();
+    console.log();
+  }
+
+
+});
+
+
+Template.scoreSheetDetails.onCreated(function(){
+  this.editMode = new ReactiveVar(false);
+
+});
+
+Template.scoreSheetDetails.helpers({
+  formCollection: function () {
+    return ScoreSheets;
+  },
+  editMode(){
+    return Template.instance().editMode.get();
+  },
+});
+
+Template.scoreSheetDetails.events({
+  'click #toggleScoreSheetEdit': function (event, template) {
+    event.preventDefault();
+    template.editMode.set( !template.editMode.get());
+  }
+});
+
+

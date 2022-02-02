@@ -1,0 +1,26 @@
+Gerry Start
+
+Warning
+setelah direbuil dari meteor belum tentu masuk publish untuk netlify
+
+Batal
+bagaimana kalau login dan handle sessionnya dicentralkan di alma juga? (Reason: sepertinya kompleks untuk kedepannya)
+
+Todo
+coba pakai max width 1366 untuk konten di dalam section pada nuxt
+Register endpoint untuk admin tetap pakai key client saja
+untuk tema custom gak pakai jsnya, tapi mau coba dikombi dengan vuetify
+
+General
+
+Done
+List dosen, artikel, dan news agar bisa ditandai sebagai featured
+deskripsi versi singkat untuk profile dosen
+slugnya harus lebih pendek, karena saat view singlenya bisa error (buat agar titlenya maximum 70 char)
+tampilkan code (slug) di daftar page
+tombol trigger rebuild untuk meteor
+pengenal partnerCode dari api untuk article dan news
+penjagaann dosen dari api yang tidak izikan, cukup hardode imavie
+string mongodb untuk yoga fastify
+
+Gerry End

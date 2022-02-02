@@ -1,0 +1,135 @@
+<template name="taForm">
+  <div class="page page-ta-form">
+    <h1 class="page-title">Form Tugas Akhir</h1>
+      {{> quickForm id="taForm" collection=formCollection type="insert" }}
+  </div>
+</template>
+
+<template name="taList">
+  <div class="page page-last-ujian-list">
+    <h1 class="page-title">Daftar Tugas Akhir</h1>
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <a href="/taForm" class="btn btn-primary">+ TA</a>
+      </div>
+    </section>
+    <ul class="list-ta list-group">
+      {{#each tugasAkhir }}
+      <li class="list-group-item">
+        <a href="/ta/{{ _id }}">
+          <div class="item d-flex flex-row justify-content-between align-items-center">
+            <div class="title">{{ title }}</div>
+            <div class="author-ps">{{formatFullname studentId }} - {{formatPs psId }}</div>
+          </div>
+        </a>
+      </li>
+      {{/each}}
+    </ul>
+  </div>
+</template>
+
+<template name="taDetails">
+  <div class="page page-ta-details">
+    <h1 class="page-title">Tugas Akhir: {{ title }}</h1>
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <a href="/ta/{{_id}}/edit" class="btn btn-warning">Edit</a>
+      </div>
+    </section>
+
+    <section class="section-ta-summary">
+      <table class="table-sm summary-table">
+        <tr>
+          <td>Author</td>
+          <td>{{formatFullname studentId }}</td>
+        </tr>
+        <tr>
+          <td>Periode Studi</td>
+          <td>{{ psId }}</td>
+        </tr>
+        <tr>
+          <td>Nomor Seri</td>
+          <td>{{ noID }}</td>
+        </tr>
+        <tr>
+          <td>Judul</td>
+          <td>{{ title }}</td>
+        </tr>
+        <tr>
+          <td>Tgl</td>
+          <td>{{ date }}</td>
+        </tr>
+        <tr>
+          <td>Venue</td>
+          <td>{{ venue }}</td>
+        </tr>
+        <tr>
+          <td>Score 1</td>
+          <td>{{ score1 }}</td>
+        </tr>
+        <tr>
+          <td>Score 2</td>
+          <td>{{ score2 }}</td>
+        </tr>
+        <tr>
+          <td>Nilai Relatif</td>
+          <td>{{ relativeScore }}</td>
+        </tr>
+        <tr>
+          <td>Predikat</td>
+          <td>{{ predicate }}</td>
+        </tr>
+        <tr>
+          <td>Revisi</td>
+          <td>{{ revisionStatus }}</td>
+        </tr>
+        <tr>
+          <td>Panitia Penguji</td>
+          <td>
+            <ul>
+              {{#each panitiaPenguji}}
+              <li class="">
+                {{ jabatan }} - {{formatFullname userId }}
+              </li>
+              {{/each}}
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>Dosen Pembimbing</td>
+          <td>
+            <ul>
+              {{#each dosenPembimbing}}
+              <li class="">
+                {{formatFullname userId }} - {{ jabatan }}
+              </li>
+              {{/each}}
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>Upload</td>
+          <td>
+            {{#if imageFile.isImage }}
+            <a class="fancybox" href="{{imageFile.link}}" target="_blank"  data-fancybox="gallery" data-caption="{{ imageFile.name }}"><img src="{{ imageFile.link }}" alt="{{ imageFile.name }}" class="thumbnail"></a>
+            {{/if}}
+            {{#if imageFile.isPDF }}
+            <a class="" href="{{imageFile.link}}" target="_blank"><i class="fa fa-file"></i> <span>{{ imageFile.name }}</span></a>
+            {{/if}}
+          </td>
+        </tr>
+      </table>
+    </section>
+
+
+
+  </div>
+</template>
+
+
+<template name="taEdit">
+  <div class="page page-ta-edit">
+    {{> quickForm id="taForm" collection=formCollection type="update" doc=this }}
+    <button id="deleteTa" class="btn btn-danger">Delete</button>
+  </div>
+</template>

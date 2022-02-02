@@ -1,0 +1,298 @@
+
+
+
+<template name="amkAssessmentForm">
+
+{{#if stillLoading }}
+  {{> nowLoading }}
+{{else }}
+  <div class="page page-acmatkul-assessment">
+    <h1 class="page-title">{{ name }}</h1>
+    <section class="section-summary">
+      {{> activeMatkulSummary}}
+    </section>
+    {{#if yetAssessed }}
+    <section class="section-amk-assessment">
+      <form action="" class="amk-assessment-form" id="amk-form">
+      {{#each assGroup}}
+        <fieldset class="fieldset">
+          <legend class="legend">{{ label }}</legend>
+          <ul class="list-group">
+          {{#each questionsInGroup }}
+            <li class="list-group-item">
+              <div class="question">{{ question }}</div>
+              <div class="radio-group assessment-answer-group">
+                <div class="radio-wrapper">
+                  <input type="radio" name="{{ id }}" id="{{ id }}-1" class="" value="1">
+                  <label for="{{ id }}-1">Sangat Kurang</label>
+                </div>
+                <div class="radio-wrapper">
+                  <input type="radio" name="{{ id }}" id="{{ id }}-2" class="" value="2">
+                  <label for="{{ id }}-2">Kurang</label>
+                </div>
+                <div class="radio-wrapper">
+                  <input type="radio" name="{{ id }}" id="{{ id }}-3" class="" value="3">
+                  <label for="{{ id }}-3">Cukup</label>
+                </div>
+                <div class="radio-wrapper">
+                  <input type="radio" name="{{ id }}" id="{{ id }}-4" class="" value="4">
+                  <label for="{{ id }}-4">Baik</label>
+                </div>
+                <div class="radio-wrapper">
+                  <input type="radio" name="{{ id }}" id="{{ id }}-5" class="" value="5">
+                  <label for="{{ id }}-5">Sangat Baik</label>
+                </div>
+              </div>
+            </li>
+          {{/each}}
+          </ul>
+        </fieldset>
+      {{/each}}
+        <div class="form-group form-actions">
+          <button class="btn btn-primary btn-block" id="submitAss">OK</button>
+        </div>
+      </form>
+    </section>
+    {{ else }}
+    <div class="page page-already-submitted">
+      <div class="no-stuffs panel panel-well">
+        <p>Maaf, Anda sudah pernah memberikan penilaian pada Tahun Akademik ini.</p>
+      </div>
+    </div>
+    {{/if}}
+  </div>
+{{/if}}
+</template>
+
+
+<template name="amkFeedbackForm">
+{{#if stillLoading }}
+  {{> nowLoading }}
+{{else }}
+	<div class="page page-feedback-form">
+		<h1 class="page-title">Feedback Form</h1>
+	  {{> activeMatkulSummary}}
+{{#if yetAssessed }}
+	  <section class="section-amk-feedback-form">
+	  	<form action="" id="amk-feedback-form">
+	  		{{#each feedbackItem }}
+	  		<div class="form-group">
+	  			<label for="">{{ label }}</label>
+	  			<textarea name="{{ id }}" id="inputSarana-{{ id }}" cols="30" rows="3" class="autosize form-control"></textarea>
+	  		</div>
+	  		{{/each}}
+	  		<div class="form-group form-actions">
+	  			<button class="btn btn-primary btn-block" id="submitFeedback">OK</button>
+	  		</div>
+	  	</form>
+	  </section>
+{{ else }}
+<div class="page page-already-submitted">
+  <div class="no-stuffs panel panel-well">
+    <p>Maaf, Anda sudah pernah memberikan penilaian pada Tahun Akademik ini.</p>
+  </div>
+</div>
+{{/if}}
+	</div>
+{{/if}}
+</template>
+
+
+<template name="amkAssessmentDetail">
+  {{#if isInRole 'formator, admin, superadmin' }}
+  <div class="page page-scoresheet-details">
+    <h1 class="page-title">{{ scoreSheetName }}</h1>
+    {{#if isInRole 'admin, superadmin'}}
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="command control">
+        <button class="btn btn-warning" id="toggleScoreSheetEdit">Ubah</button>
+        <button class="btn btn-danger" id="deleteScoresheet">Hapus</button>
+      </div>
+    </section>
+    {{/if}}
+
+    <section class="section-scoresheet-info">
+    <ul class="list-group-item info-list">
+      <li class="list-group-item d-flex">
+        <div class="col-sm-6">Penilai</div>
+        <div class="col-sm-6 username name title">{{formatUsername createdBy }}</div>
+      </li>
+      <li class="list-group-item d-flex">
+        <div class="col-sm-6">Tanggal/Jam</div>
+        <div class="col-sm-6">{{formatHRDT timestamp}}</div>
+      </li>
+      <li class="list-group-item d-flex">
+        <div class="col-sm-6">Mata Kuliah</div>
+        <div class="col-sm-6 title">{{formatAcmatkulName acmatkulId}}</div>
+      </li>
+      <li class="list-group-item d-flex">
+        <div class="col-sm-6">Dosen</div>
+        <div class="col-sm-6 title">{{getDosen acmatkulId}}</div>
+      </li>
+      <li class="list-group-item d-flex">
+        <div class="col-sm-6">Template</div>
+        <div class="col-sm-6 title">{{getTemplateName templateId}}</div>
+      </li>
+    </ul>
+    </section>
+
+
+    <section class="section-scoresheet-data">
+      <h2 class="section-title">Isi Penilaian</h2>
+      <table class="table scoresheet-detail-data">
+      {{#each assGroup }}
+      <thead>
+        <tr class="">
+          <th class="" colspan="2">{{getGroupName id }}</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{#each scoringItems}}
+        <tr>
+          <td class="name">{{getQuestion itemId}}</td>
+          <td><span class="label answer value-{{ itemValue }}">{{formatAnswer itemValue }}</span></td>
+        </tr>
+      {{/each}}
+      </tbody>
+      {{/each}}
+    </table>
+  </section>
+
+  <section class="section-feedback">
+    <h2 class="section-title">Feedback</h2>
+    <ul class="list-group feedback-list">
+    {{#each lexpFeedback }}
+      <li class="list-group-item">
+        <div class="title">{{getFbLabel itemId }}</div>
+        <div class="description">{{ value }}</div>
+      </li>
+    {{/each}}
+    </ul>
+  </section>
+  </div>
+  {{/if}}
+</template>
+
+
+
+
+
+<template name="amkAssessmentReport">
+  {{#if equals loadingCount 5 }}
+  <div class="page page-amk-assreport">
+    <h1 class="page-title">Laporan Evaluasi</h1>
+    {{> activeMatkulSummary}}
+  {{#if isInRole 'dosen, admin, superadmin' }}
+  <section class="section-summary">
+    <h2 class="section-title">Evaluation Summary</h2>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>Jumlah Responden</td>
+          <td class="text-right">{{ sheetCount.selfCount }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="section-group-summary">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Grup</th>
+          <th class="text-right">Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each group}}
+        <tr>
+          <td>{{getGroupName _id }}</td>
+          <td class="text-right"> {{{formatStanding standing }}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </section>
+  <section class="section-item-summary">
+    <h2 class="section-title">Item Summary</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th class="text-right">My Avg</th>
+          <th class="text-right">My Standing</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each groupedItems }}
+        <tr class="group-title">
+          <th colspan="3" class="">{{getGroupName id}}</th>
+        </tr>
+        {{#each items }}
+        <tr>
+          <td>{{getQuestion itemId }}</td>
+          <td class="text-right">{{formatDec2 myAvg }}</td>
+          <td class="text-right">{{{formatStanding itemStanding }}}</td>
+        </tr>
+        {{/each}}
+        {{/each}}
+      </tbody>
+    </table>
+  </section>
+  {{#if greaterThan feedbackGroup.length 0 }}
+  <section class="section-feedback-list">
+    <h2 class="section-title">Masukan Lainnya</h2>
+    <ul class="feedback-list list-unstyled">
+    {{#each feedbackGroup }}
+    <li class="feedback-group">
+      <h3>{{getFbLabel id }}</h3>
+      <ul class="list-group">
+        {{#each feedbacks }}
+        <li class="list-group-item">{{ this }}</li>
+        {{/each}}
+      </ul>
+    </li>
+    {{/each}}
+    </ul>
+  </section>
+  {{/if}}
+  {{/if}}
+
+  {{#if isInRole 'admin, superadmin' }}
+    <!-- view list -->
+    <section class="section-sheets-list">
+      <h2 class="section-title">Daftar Lembar Evaluasi</h2>
+      <ul class="list-group">
+        {{#each sheets }}
+        <li class="list-group-item">
+          <a href="/assessment/{{ _id }}/detail">
+            <div class="d-flex">
+              <div class="flex-grow-1">{{formatUsername createdBy }}</div>
+              <div class="flex-shrink-0">{{formatHRDT timestamp }}</div>
+            </div>
+          </a>
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+  {{/if}}
+  </div>
+  {{else}}
+  {{> nowLoading}}
+  {{/if}}
+</template>
+
+<template name="assessmentList">
+  <h1 class="page-title">Assessment List</h1>
+  <ul class="list-group">
+    {{#each assessments }}
+    <li class="list-group-item">
+      <a href="/assessment/{{ _id }}/detail">
+        <div class="item d-flex justify-content-between">
+          <div>{{formatUsername createdBy}} <span class="label acmatkul">{{formatAcmatkulName acmatkulId }} </span></div>
+          <div>{{formatHRDT timestamp }}</div>
+        </div>
+      </a>
+    </li>
+    {{/each}}
+  </ul>
+</template>

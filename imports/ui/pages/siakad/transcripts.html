@@ -1,0 +1,118 @@
+<template name="transcriptDetails">
+	<div class="page page-transcript-detail">
+		<div class="page-header">
+			<h1 class="page-title">Transcript Nilai</h1>
+			<p class="subtitle">{{ studentName }}<br>{{ noPokok }}</p>
+		</div>
+		<section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="">
+			  {{#if isInRole 'admin, superadmin' }}
+        <a href="/transcript/{{ _id }}/inject" class="btn btn-warning">Inject Nilai</a>
+        <a href="/transcript/{{ _id }}/edit" class="btn btn-warning">Edit</a>
+        {{/if}}
+      </div>
+    </section>
+    <table class="table summary-table">
+    	<tbody>
+    		<tr>
+    			<th>Total SKS</th>
+    			<td class="text-right">{{ totalSks }}</td>
+    		</tr>
+    		<tr>
+    			<th>IPK</th>
+    			<td class="text-right">{{ gpaf }}</td>
+    		</tr>
+    	</tbody>
+    </table>
+		<table class="table">
+			<thead>
+				<th width="60">Kode</th>
+				<th>Mata Kuliah</th>
+				<th width="60" class="text-center">SKS</th>
+				<th width="60" class="text-right">Nilai</th>
+			</thead>
+			<tbody>
+				{{#each mk }}
+				<tr>
+				<td class="code name">{{ code }}</td>
+				<td class="name">
+					<div>{{ mkName }}</div>
+					<div><em>{{ mkNameEn }}</em></div>
+				</td>
+				<td class="text-center">{{ sks }}</td>
+				<td class="text-right">{{ score }}</td>
+				</tr>
+				{{/each}}
+			</tbody>
+		</table>
+	</div>
+</template>
+
+<template name="transcriptsList">
+	<div class="page page-transcript-list">
+		<h1 class="page-title">Daftar Semua Transcript</h1>
+		<ul class="list-group">
+			{{#each transcripts}}
+				<li class="list-group-item"><a href="/transcript/{{ _id }}/details">{{ noPokok }} {{ studentName }}</a></li>
+			{{/each}}
+		</ul>
+	</div>
+</template>
+
+
+<template name="transcriptInject">
+  {{#if isInRole 'admin, superadmin' }}
+	<div class="page page-transcript-inject">
+		<h1 class="page-title">Inject Transcript</h1>
+	</div>
+	<div class="panel panel-search-mk">
+		<div class="row">
+			<div class="form-group col-12 col-sm-8 col-md-9 col-lg-10">
+				<label for="">Mata Kuliah</label>
+				<select name="selectMk" id="selectMk" class="form-control select2">
+					<option value="null">== Cari Mata Kuliah ==</option>
+					{{#each matkuls}}
+					<option value="{{ _id }}">{{ code }} - {{ name }}</option>
+					{{/each}}
+				</select>
+			</div>
+			<div class="form-group col-12 col-sm-4 col-md-3 col-lg-2">
+				<label class="text-right" for="">Nilai</label>
+				<input type="number" class="form-control text-right" name="inputScore" min="0" max="100" id="inputScore">
+			</div>
+		</div>
+		<div class="form-group">
+			<button class="btn btn-primary btn-block" id="pushMk">Tambahkan</button>
+		</div>
+	</div>
+	<form action="" id="injectForm">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Mata Kuliah</th>
+					<th class="text-right">Nilai</th>
+					<th width="60">&nbsp;</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#each selectedMk}}
+				<tr>
+					<td class="name">{{ code }} - {{ mkName }}</td>
+					<td width="100" class="text-right">{{ score }}</td>
+					<td><button type="button" class="btn btn-danger delete-this"><i class="fa fa-times"></i></button></td>
+				</tr>
+				{{/each}}
+			</tbody>
+		</table>
+		<div class="form-actions">
+		{{#if greaterThan selectedMk.length 0 }}
+			<button type="button" class="btn btn-primary btn-block" id="submitInjection">OK</button>
+		{{else}}
+			<button disabled="disabled" type="button" class="btn btn-primary disabled btn-block">OK</button>
+		{{/if}}
+		</div>
+
+	</form>
+	{{/if}}
+
+</template>

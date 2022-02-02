@@ -1,0 +1,136 @@
+<template name="listOutlet">
+
+    {{#if isInRole 'cmsOutletList'}}
+    <div class="page page-matkul-page">
+        <h1 class="page-title">Pengaturan Outlet</h1>
+        <section class="">
+            <div class="btn-group" role="group" aria-label="command control">
+                {{#if toogleAdd}}
+                {{else}}
+                    {{#if isInRole 'cmsOutletCreate'}}
+                        <button class="btn btn-primary" id="tambah-outlet">
+                            <i class="fa fa-plus"></i><span>Tambah Outlet</span>
+                        </button>
+                    {{/if}}
+                {{/if}}
+            </div>
+        </section>
+        {{#if toogleAdd}}
+        <section class="">
+            <div class="form-group">
+                <label for="" class="text-left">Nama</label>
+                <input type="text" id="nama-outlet" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="" class="text-left">Kode</label>
+                <input type="text" id="kode-outlet" class="form-control">
+                {{#if availability}}
+                <button class="btn btn-success mt-3">Tersedia</button>
+                {{else}}
+                <button class="btn btn-danger mt-3">Sudah Dipakai</button>
+                {{/if}}
+            </div>
+            <div class="form-group">
+                <label for="" class="text-left">Deskripsi</label>
+                <input type="text" id="desc-outlet" class="form-control">
+            </div>
+            <div class="form-group">
+                <!-- <button class="btn btn-danger cancel">Cancel</button> -->
+                {{#if availability}}
+                <button class="btn btn-primary" id="submit-outlet">Tambahkan</button>
+                {{else}}
+                <button class="btn btn-primary" id="submit-outlet" disabled>Tambahkan</button>
+                {{/if}}
+            </div>
+        </section>
+        {{/if}}
+
+        <section class="section-matkul-list">
+            <h2 class="section-title">Daftar Outlet</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th width="25%">Nama</th>
+                        <th width="25%">Kode</th>
+                        <th width="40%">Deskripsi</th>
+                        <th width="10%">Action</th>
+                    </tr>
+                </thead>
+                {{#each outlets}}
+                <tr class="{{#if status}}{{else}}table-danger{{/if}}">
+                    <td>{{ name }}</td>
+                    <td>{{ code }}</td>
+                    <td>{{ details }}</td>
+                    {{#if isInRole 'cmsOutletEdit'}}
+                    <td class="float-left">
+                        <a class="btn toggle-outlet"><i class="fa fa-eye" status="{{status}}" milik="{{_id}}"
+                                value="{{status}}"></i></a>
+                        {{#if status}}<a class="btn btn-edit btn-primary" href="{{ pathFor route='editOutlet' _id=_id }}"> <i class="fa fa-edit" milik="{{_id}}"></i></a>{{/if}}
+                    </td>
+                    {{/if}}
+                </tr>
+                <tr class="" id="editform-{{_id}}" hidden>
+                    <td>
+                        <label for="">Nama</label>
+                        <input type="text" class="form-control" id="form-edit-name-{{_id}}" value="{{name}}">
+                    </td>
+                    <td>
+                        <label for="">Kode</label>
+                        <input type="text" class="form-control" id="form-edit-kode-{{_id}}" value="{{code}}">
+                    </td>
+                    <td>
+                        <label for="">Deskripsi</label>
+                        <input type="text" class="form-control" id="form-edit-desc-{{_id}}" value="{{details}}">
+                    </td>
+                    <td>
+                        <button class="btn btn-primary save-form" value="{{_id}}">Save</button>
+                        <button class="btn btn-danger cancel-form" value="{{_id}}">Cancel</button>
+                        <!-- <input type="text" value="{{details}}"> -->
+                    </td>
+
+                </tr>
+                {{/each}}
+            </table>
+        </section>
+    </div>
+    {{else}}
+        {{> notAuthorized}}
+    {{/if}}
+</template>
+
+<template name="editOutlet">
+    {{#if isInRole 'cmsOutletEdit'}}
+    <div class="page page-matkul-page">
+        <h1 class="page-title">Edit Outlet</h1>
+        <section class="">
+            <div class="form-group">
+                <label for="" class="text-left">Nama</label>
+                <input type="text" id="nama-outlet" class="form-control" value="{{outlet.name}}">
+            </div>
+            <div class="form-group">
+                <label for="" class="text-left">Kode</label>
+                <input type="text" id="kode-outlet" class="form-control" value="{{outlet.code}}">
+                {{#if availability}}
+                <button class="btn btn-success mt-3">Tersedia</button>
+                {{else}}
+                <button class="btn btn-danger mt-3">Sudah Dipakai</button>
+                {{/if}}
+            </div>
+            <div class="form-group">
+                <label for="" class="text-left">Deskripsi</label>
+                <input type="text" id="desc-outlet" class="form-control" value="{{outlet.details}}">
+            </div>
+            <div class="form-group">
+                <!-- <button class="btn btn-danger cancel">Cancel</button> -->
+                {{#if availability}}
+                <button class="btn btn-primary" id="submit-outlet" milik="{{outlet._id}}">Simpan</button>
+                {{else}}
+                <button class="btn btn-primary" id="submit-outlet" disabled>Simpan</button>
+                {{/if}}
+            </div>
+        </section>
+    </div>
+    {{else}}
+        {{> notAuthorized}}
+    {{/if}}
+</template>

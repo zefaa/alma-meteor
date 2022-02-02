@@ -1,0 +1,258 @@
+<template name="listArticle">
+
+    {{#if isInRole 'cmsArticleList' }}
+        <div class="page page-matkul-page">
+            <h1 class="page-title">Artikel</h1>
+            <section class="section-page-shoulders">
+                <div class="btn-group" role="group" aria-label="command control">
+                    {{#if isInRole 'cmsArticleCreate'}}
+                        <a class="btn btn-primary" id="buat-artikel" href="{{ pathFor route='createArticle' }}">
+                            <i class="fa fa-plus"></i><span>Buat Artikel</span>
+                        </a>
+                    {{/if}}
+                </div>
+            </section>
+            <section class="section-matkul-list">
+                <h2 class="section-title">Daftar Artikel</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th width="30%">Judul</th>
+                            <th width="25%">Pembuat</th>
+                            <th width="10%">Publish</th>
+                            <th width="25%">Action</th>
+                        </tr>
+                    </thead>
+                    {{#each i in articles}}
+                        <tr class="{{#if i.status}}{{else}}table-danger{{/if}}">
+                            <td>{{ i.title }}</td>
+                            <td>{{ i.author }}</td>
+                            <td>{{ formatHRDate i.publishDate }}</td>
+                            <td>
+                                {{#if isInRole 'cmsArticleDelete'}}
+                                    <a class="btn btn-primary toggle-article">
+                                        <i class="fa fa-eye text-white" status="{{i.status}}" milik="{{i._id}}" value="{{i.status}}">
+                                        </i>
+                                    </a>
+                                {{/if}}
+                                {{#if i.status}}
+                                    {{#if isInRole 'cmsArticleEdit'}}
+                                        <a class="btn btn-primary btn-edit" href="{{ pathFor route='editArticle' _id=(toMeteorId i._id) }}">
+                                            <i class="fa fa-edit" milik="{{i._id}}"></i>
+                                        </a>
+                                    {{/if}}
+                                    {{#if isInRole 'cmsArticleFeatured'}}
+                                        <a class="btn btn-primary toggle-featured">
+                                            <i aria-hidden="true" class="fa fa-star {{#if i.featured}}text-orange{{else}}text-white{{/if}}" status="{{i.featured}}" milik="{{ toMeteorId i._id}}" value="{{i.featured}}">
+                                            </i>
+                                        </a>
+                                    {{/if}}
+                                {{/if}}
+                            </td>
+                        </tr>
+                    {{/each}}
+                </table>
+            </section>
+        </div>
+    {{ else }}
+        {{> notAuthorized }}
+    {{/ if}}
+</template>
+
+<template name="createArticle">
+    {{#if isInRole 'cmsArticleCreate' }}
+    <div class="page">
+        <h1 class="page-title">Buat Artikel</h1>
+        <section class="">
+            <div class="form-group">
+                <label for="" class="text-left">Judul Artikel</label>
+                <input type="text" id="judul-artikel" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="" class="text-left">Slug</label>
+                <input type="text" id="slug" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="" class="text-left">Author</label>
+                <input type="text" id="author" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="" class="text-left">Penjelasan Singkat</label>
+                <input type="text" id="excerpt" class="form-control">
+            </div>
+            {{#if isInRole 'superadmin'}}
+            <div class="form-group">
+                <label for="" class="text-left">Outlet</label>
+                {{#each outlets}}
+                    <div class="form-check">
+                        <input type="checkbox" name="" class="form-check-input outlet"
+                            style="margin-left: -1.25rem; margin-top: 0.3rem;" id="outlet-{{code}}" value="{{code}}">
+                        <label for="outlet-{{code}}" class="form-check-label">{{name}} - {{code}}</label>
+                    </div>
+                {{/each}}
+            </div>
+            {{/if}}
+            <div class="form-group">
+                <label for="">Tanggal Publish</label>
+                <input type="date" name="" class="form-control" id="publish-date">
+            </div>
+            <label for="">Isi Artikel</label>
+            <!-- The toolbar will be rendered in this container. -->
+            <div id="toolbar-container"></div>
+
+            <!-- This container will become the editable. -->
+            <div id="editor" class="ckeditor-content">
+            </div>
+            <div class="form-group mt-3">
+                <label for="inputDescription">Gambar Artikel</label>
+                  <div class="uploading">
+                    {{#with currentUpload}}
+                        <p>Mengunggah <b>{{file.name}}</b>:</p>
+                        <span id="progress">{{progress.get}}%</span>
+                    {{else}}
+                        <div>
+                            <input class="hidden" id="uploadImage" type="file"/>
+                            <label class="btn btn-primary btn-lg" for="uploadImage">Unggah</label>
+                        </div>
+                    {{/with}}
+                  </div>
+
+                  {{#if imageFile }}
+                      <div class="d-flex flex-wrap">
+                          <span>disini</span>
+                        {{#with thisFile }}
+                            <div class="uploaded-image m-2">
+                                {{#if isImage }}
+                                    <a href="{{ link }}" class="fancybox image" data-fancybox="chronicle-files">
+                                        <img src="{{ link }}" alt="{{ name }}" class="thumbnail">
+                                    </a>
+                                {{else}}
+                                  <a href="{{ link }}" class="btn btn-primary btn-lg" target="_blank" rel="noreferrer">
+                                    <i class="fa fa-file"></i>
+                                    <p>{{ name }}</p>
+                                  </a>
+                                {{/if}}
+                                <!-- pakai X, karena jika pakai icon dan meski sudah dikasih aria, malah iconnya yang kebaca eventnya -->
+                                <button class="btn btn-danger remove-image"
+                                        buttonData="{{_id}}">
+                                  X
+                                </button>
+                            </div>
+                        {{/with}}
+                      </div>
+                  {{/if}}
+            </div>
+            <div class="form-group mt-3">
+                <button class="btn btn-primary" id="submit-article">Post Artikel</button>
+            </div>
+        </section>
+    </div>
+    {{ else }}
+        {{> notAuthorized }}
+    {{/ if}}
+</template>
+
+<template name="editArticle">
+    {{#if isInRole 'cmsArticleEdit' }}
+    <div class="page">
+        <h1 class="page-title">Edit Artikel</h1>
+        <section class="">
+            <div class="form-group">
+                <label for="" class="text-left">Judul Artikel</label>
+                <input type="text" id="title" class="form-control" value="{{ article.title }}">
+            </div>
+            <div class="form-group">
+                <label for="" class="text-left">Slug</label>
+                <input type="text" id="slug" class="form-control" value="{{ article.slug }}">
+            </div>
+            <div class="form-group">
+                <label for="" class="text-left">Author</label>
+                <input type="text" id="author" class="form-control" value="{{ article.author }}">
+            </div>
+            <div class="form-group">
+                <label for="" class="text-left">Penjelasan Singkat</label>
+                <input type="text" id="excerpt" class="form-control" value="{{ article.excerpt }}">
+            </div>
+            {{#if isInRole 'superadmin'}}
+            <div class="form-group">
+                <label for="" class="text-left">Outlet</label>
+                {{#each outlets}}
+                <div class="form-check">
+                    <input type="checkbox" name="" class="form-check-input outlet"
+                        style="margin-left: -1.25rem; margin-top: 0.3rem;" id="outlet-{{i._id}}" value="{{code}}">
+                    <label for="outlet-{{code}}" class="form-check-label">{{name}} - {{code}}</label>
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
+            <div class="form-group">
+                <label for="">Tanggal Publish</label>
+                <input type="date" name="" class="form-control" id="publish-date" value="{{formatHtmlDate article.publishDate}}">
+            </div>
+            <label for="">Isi Artikel</label>
+            <!-- The toolbar will be rendered in this container. -->
+            <div id="toolbar-container"></div>
+
+            <!-- This container will become the editable. -->
+            <div id="editor" class="ckeditor-content">
+            </div>
+            <div class="form-group mt-3">
+                <label for="inputDescription">Gambar Artikel</label>
+                  <div class="uploading">
+                    {{#with currentUpload}}
+                        <p>Mengunggah <b>{{file.name}}</b>:</p>
+                        <span id="progress">{{progress.get}}%</span>
+                    {{else}}
+                        <div>
+                            <input class="hidden" id="uploadImage" type="file"/>
+                            <label class="btn btn-primary btn-lg" for="uploadImage">Unggah</label>
+                        </div>
+                    {{/with}}
+                  </div>
+
+                  {{#if imageFile }}
+                      <div class="d-flex flex-wrap">
+                        {{#with thisFile }}
+                            <div class="uploaded-image m-2">
+                                {{#if isImage }}
+                                    <a href="{{ link }}" class="fancybox image" data-fancybox="chronicle-files">
+                                        <img src="{{ link }}" alt="{{ name }}" class="thumbnail">
+                                    </a>
+                                {{else}}
+                                  <a href="{{ link }}" class="btn btn-primary btn-lg" target="_blank" rel="noreferrer">
+                                    <i class="fa fa-file"></i>
+                                    <p>{{ name }}</p>
+                                  </a>
+                                {{/if}}
+                                <!-- pakai X, karena jika pakai icon dan meski sudah dikasih aria, malah iconnya yang kebaca eventnya -->
+                                <button class="btn btn-danger remove-image"
+                                        buttonData="{{_id}}">
+                                  X
+                                </button>
+                            </div>
+                        {{/with}}
+                      </div>
+                  {{/if}}
+            </div>
+            {{#if article.fireImageLink}}
+                {{#if notEqual article.fireImageLink ''}}
+                    <div class="form-group mt-3">
+                        <label for="inputDescription">Gambar Dari External</label>
+                        <p class="text-danger">Akan hilang jika Gambar Artikel ada</p>
+                        <div class="d-flex flex-wrap">
+                            <a href="{{ article.fireImageLink }}" class="fancybox image" data-fancybox="chronicle-files">
+                                <img src="{{ article.fireImageLink }}" alt="{{ article.fireImageLink }}" class="thumbnail">
+                            </a>
+                        </div>
+                    </div>
+                {{/if}}
+            {{/if}}
+            <div class="form-group mt-3">
+                <button class="btn btn-primary" id="save-article">Save Artikel</button>
+            </div>
+        </section>
+    </div>
+    {{ else }}
+        {{> notAuthorized }}
+    {{/ if}}
+</template>

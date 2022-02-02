@@ -1,0 +1,110 @@
+<template name="booksList">
+  <div class="page page-books-list">
+    <h1 class="page-title">Buku</h1>
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="Action">
+        <button class="btn btn-primary" id="toggle-book-form">+ Buku Baru</button>
+      </div>
+    </section>
+    {{#if showCreateForm }}
+      <section class="section-book-form">
+        {{> quickForm id="bookForm" collection=formCollection type="insert"}}
+      </section>
+    {{ else }}
+    <section class="books-list">
+      <h2 class="section-title">Daftar Buku</h2>
+      <ul class="books-list list-group">
+        {{#each book}}
+        <li class="list-group-item">
+          <a href="/book/{{ _id }}">
+            {{> bookListItem}}
+          </a>
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+    {{/if}}
+  </div>
+</template>
+
+
+<template name="searchBook">
+    <div class="searchbox" id="search-book">{{> EasySearch.Input index=bookIndex noDocumentsOnEmpty=true attributes=attributes }}</div>
+    <nav class="search-results" id="search-book-result">
+    <ul class="list-group book-search-list">
+        {{#EasySearch.Each index=bookIndex }}
+                {{> bookSearchItem}}
+        {{/EasySearch.Each}}
+        </ul>
+    </nav>
+    {{#EasySearch.IfInputEmpty index=bookIndex}}
+      <div class="panel panel-well">Silahkan ketik untuk mulai pencarian dari judul, author, penerbit.</div>
+    {{/EasySearch.IfInputEmpty}}
+    {{#EasySearch.IfNoResults index=bookIndex}}
+      <div>Tidak ada hasil pencarian.</div>
+    {{/EasySearch.IfNoResults}}
+</template>
+
+
+<template name="bookListItem">
+  <div class="item d-flex flex-row justify-content-between align-items-center">
+    <div class="book-title title">{{ title }}</div>
+    <div class="author">{{ author }}</div>
+    <div class="publisher">{{ publisher }}</div>
+    <div class="year">{{ year }}</div>
+  </div>
+  <div class="description">{{ description }}</div>
+  <div class="topic">{{ topic }}</div>
+</template>
+
+<template name="bookSearchItem">
+<li class="list-group-item status-{{ status }} status-{{ status }}-selectThisBook" tabindex="0">
+  <div class="item d-flex flex-row justify-content-between align-items-center ">
+    <div class="book-title title">{{ title }}</div>
+    <div class="author"><span class="author">{{ author }}</span></div>
+    <div class="publisher"><span class="publisher">{{ publisher }}</span></div>
+    <div class="year">{{ year }}</div>
+  </div>
+</li>
+</template>
+
+
+<template name="bookDetails">
+  <div class="page page-book-details">
+    <h1 class="page-title">{{ title }}</h1>
+    <section class="section-page-shoulders">
+      <div class="btn-group" role="group" aria-label="Action">
+        <a href="/book/{{ _id }}/edit" class="btn btn-warning">Edit</a>
+      </div>
+
+    </section>
+    <table class="table table-bordered">
+      <tr>
+        <td>Author</td>
+        <td class="author">{{ author }}</td>
+      </tr>
+      <tr>
+        <td>Publisher</td>
+        <td class="publisher">{{ publisher }}</td>
+      </tr>
+      <tr>
+        <td>year</td>
+        <td>{{ year }}</td>
+      </tr>
+    </table>
+    <section class="section-borrow-history">
+      <h2 class="section-title">Borrow History</h2>
+      <ul class="list-group borrow-history-list">
+        {{#each borrowHistory}}
+        <li class="list-group-item d-flex flex-row justify-content-between align-items-center">
+          <div class="ticket-id">{{ ticketId }}</div>
+          <div class="ticket-id">{{ timestamp }}</div>
+          <div class="ticket-id">{{ returnTimestamp }}</div>
+          <div class="ticket-id">{{ borrowerId }}</div>
+          <div class="ticket-id">{{ borrowerName }}</div>
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+  </div>
+</template>

@@ -1,0 +1,7 @@
+node_modules/
+uploads
+next-alma.txt
+.settings.json
+.vscode
+settings.json
+.deploy/mup.js
